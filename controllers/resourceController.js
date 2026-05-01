@@ -1,45 +1,41 @@
-import Class from "./../models/Class.js";
+import Resource from "../models/Resource.js";
 
-//// CRUD
-
-const createClass = async (req, res) => {
+// CRUD
+const createResource = async (req, res) => {
   try {
-    // filtering for _id and __v
-    let clss;
+    // filtering for _id and __v to not let client create their own ones
+    let resources;
     if (Array.isArray(req.body)) {
-      clss = req.body.map((cls) => {
-        const { _id, __v, ...rest } = cls;
-        return rest;
+      resources = req.body.map((resource) => {
+        const { _id, __v, ...rest } = resource;
+        resources = rest;
       });
     } else {
       const { _id, __v, ...rest } = req.body;
-      clss = rest;
     }
 
-    const createdClasses = await Class.create(clss);
+    const createdResources = await Resource.create(req.body);
     res.status(201).json({
       status: "success",
-      results: createdClasses.length,
       data: {
-        classes: createdClasses,
+        resources: createdResources,
       },
     });
   } catch (err) {
-    res.status(400).json({
+    req.status(400).json({
       status: "fail",
       message: err,
     });
   }
 };
 
-const getAllClasses = async (req, res) => {
+const getAllResource = async (req, res) => {
   try {
-    const classes = await Class.find({});
+    const allResources = await Resource.find({});
     res.status(200).json({
       status: "success",
-      results: classes.length,
       data: {
-        classes: classes,
+        resources: allResources,
       },
     });
   } catch (err) {
@@ -52,18 +48,18 @@ const getAllClasses = async (req, res) => {
 
 const getById = async (req, res) => {
   try {
-    const foundClass = await Class.findById(req.params.id);
-    if (!foundClass) {
+    const foundResource = await Resource.findById(req.params.id); // parsing from /:id in the url
+    if (!foundResource) {
       res.status(404).json({
-        status: "error",
-        message: "Class not found",
+        status: "fail",
+        message: "Resource not found",
       });
       return;
     }
     res.status(200).json({
       status: "success",
       data: {
-        class: foundClass,
+        resources: foundResource,
       },
     });
   } catch (err) {
@@ -76,22 +72,22 @@ const getById = async (req, res) => {
 
 const updateById = async (req, res) => {
   try {
-    const updatedClass = await Class.findByIdAndUpdate(req.params.id, req.body, {
-      returnDocument: "after",
-      runValidators: true,
+    const foundResource = await Resource.findByIdAndUpdate(req.params.id, req.body, {
+      returnDocuemnt: "after",
+      rundValidators: true,
     });
 
-    if (!updatedClass) {
+    if (!foundResource) {
       res.status(404).json({
-        status: "error",
-        message: "Class not found",
+        status: "fail",
+        message: "Resource not found",
       });
       return;
     }
     res.status(200).json({
       status: "success",
       data: {
-        class: updatedClass,
+        resources: foundResource,
       },
     });
   } catch (err) {
@@ -104,18 +100,19 @@ const updateById = async (req, res) => {
 
 const deleteById = async (req, res) => {
   try {
-    const deletedClass = await Class.findByIdAndDelete(req.params.id);
-    if (!deletedClass) {
+    const deletedResource = await Resource.findByIdAndDelete(req.params.id);
+
+    if (!deletedResource) {
       res.status(404).json({
-        status: "error",
-        message: "Class not found",
+        status: "fail",
+        message: "Resource not found",
       });
       return;
     }
     res.status(204).json({
       status: "success",
       data: {
-        class: null,
+        resources: null,
       },
     });
   } catch (err) {
@@ -126,4 +123,4 @@ const deleteById = async (req, res) => {
   }
 };
 
-export { createClass, getAllClasses, getById, updateById, deleteById };
+export { createResource, getAllResource, getById, updateById, deleteById };
