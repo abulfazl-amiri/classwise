@@ -1,9 +1,16 @@
 import { Router } from "express";
 
-import { createClass } from "../controllers/classController.js";
+import {
+  createClass,
+  getAllClasses,
+  getClassById,
+  updateClass,
+  deleteClass,
+} from "../controllers/classController.js";
 
 const router = Router();
 
-router.post("/", createClass);
+router.route("/").post(createClass).get(getAllClasses);
+router.route("/:id").get(getClassById).patch(updateClass).delete(deleteClass);
 
 export default router;

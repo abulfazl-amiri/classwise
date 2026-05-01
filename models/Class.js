@@ -4,39 +4,56 @@ const classSchema = new mongoose.Schema({
   name: {
     type: Schema.Types.String,
     required: [true, "Name is required"],
+    trim: true,
   },
   subject: {
     type: Schema.Types.String,
     required: [true, "Subject is required"],
+    trim: true,
   },
-  book: {
+  resources: {
+    type: [String],
+    required: [true, "Resources is required"],
+  },
+
+  startTime: {
     type: Schema.Types.String,
-    required: [true, "Book is required"],
+    trim: true,
   },
+  endTime: {
+    type: Schema.Types.String,
+    trim: true,
+  },
+
   lastTaughtDate: {
     type: Schema.Types.Date,
   },
 
   totalPages: {
-    type: Schema.Types.Int32,
+    type: Number,
     required: [true, "Page is required"],
+    min: [0, "Total pages can not be less than 0"],
   },
   currentPage: {
-    type: Schema.Types.Int32,
+    type: Number,
     default: 0,
+    min: [0, "Current page can not be less than 0"],
   },
   totalChapters: {
-    type: Schema.Types.Int32,
+    type: Number,
     required: [true, "Total Chapters is required"],
+    min: [0, "Total chapters can not be less than 0"],
   },
   currentChapter: {
-    type: Schema.Types.Int32,
+    type: Number,
     default: 0,
+    min: [0, "Current chapter can not be less than 0"],
   },
 
   students: {
-    type: Schema.Types.Int32,
+    type: Number,
     default: 0,
+    min: [0, "Students can not be less than 0"],
   },
 });
 
