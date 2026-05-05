@@ -1,4 +1,5 @@
 import express from "express";
+import morgan from "morgan";
 
 import classRoutes from "./routes/classRoutes.js";
 import resourceRoutes from "./routes/resourceRoutes.js";
@@ -6,17 +7,25 @@ import resourceRoutes from "./routes/resourceRoutes.js";
 const app = express();
 
 app.use(express.json());
+app.use(morgan("dev"));
 
 app.use("/api/v1/classes", classRoutes);
-app.use("/api/v1/resource", resourceRoutes);
+app.use("/api/v1/resources", resourceRoutes);
 
-// app.get("/", (req, res) => {
-//   res.status(200).json({
-//     status: "success",
-//     data: {
-//       message: "App is fine, no data yet.",
-//     },
-//   });
-// });
+// invalid routes
+app.use((req, res) => {
+  res.status(404).json({
+    status: "error",
+    message: `Could not find endpoint '${req.originalUrl}' on the available endpoints`,
+  });
+});
+
+// server error
+app.use((err, req, res, next) => {
+  res.status(500).json({
+    status: "error",
+    message: err.message,
+  });
+});
 
 export default app;

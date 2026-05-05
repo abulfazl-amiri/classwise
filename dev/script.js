@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv/config.js";
 import express from "express";
 import Class from "../models/Class.js";
+import Resource from "../models/Resource.js";
 
 try {
   await mongoose.connect(process.env.MONGO_URI);
@@ -11,16 +12,33 @@ try {
 }
 
 // DELETE ALL DATA FROM DB
-const deleteAllData = async function () {
+
+const deleteAllClasses = async function () {
   try {
     await Class.deleteMany({}); // {}: match all documents in the collection
-    console.log("All the data deleted successfully");
+    console.log("All the classes deleted successfully");
   } catch (err) {
     console.err(err);
   }
 };
 
-if (process.argv[2] === "--delete" || process.argv[2] === "-d") {
-  await deleteAllData();
+const deleteAllResources = async function () {
+  try {
+    await Resource.deleteMany({}); // {}: match all documents in the collection
+    console.log("All the resources deleted successfully");
+  } catch (err) {
+    console.err(err);
+  }
+};
+
+if (process.argv[2] === "--delete" && process.argv[3] === "--classes") {
+  await deleteAllClasses();
   process.exit();
+} else if (process.argv[2] === "--delete" && process.argv[3] === "--resources") {
+  await deleteAllResources();
+  process.exit();
+} else {
+  console.log(
+    "Nothing to do!, please specify --delete  and --resource | --classes to delete all of them from db",
+  );
 }

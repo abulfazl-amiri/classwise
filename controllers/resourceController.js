@@ -12,17 +12,19 @@ const createResource = async (req, res) => {
       });
     } else {
       const { _id, __v, ...rest } = req.body;
+      resources = rest;
     }
 
-    const createdResources = await Resource.create(req.body);
+    const createdResources = await Resource.create(resources);
     res.status(201).json({
       status: "success",
+      results: createdResources.length,
       data: {
         resources: createdResources,
       },
     });
   } catch (err) {
-    req.status(400).json({
+    res.status(400).json({
       status: "fail",
       message: err,
     });
@@ -34,6 +36,7 @@ const getAllResource = async (req, res) => {
     const allResources = await Resource.find({});
     res.status(200).json({
       status: "success",
+      results: allResources.length,
       data: {
         resources: allResources,
       },
@@ -73,8 +76,8 @@ const getById = async (req, res) => {
 const updateById = async (req, res) => {
   try {
     const foundResource = await Resource.findByIdAndUpdate(req.params.id, req.body, {
-      returnDocuemnt: "after",
-      rundValidators: true,
+      returnDocument: "after",
+      runValidators: true,
     });
 
     if (!foundResource) {
