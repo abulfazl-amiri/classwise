@@ -11,6 +11,7 @@ const createResource = async (req, res) => {
         return rest;
       });
     } else {
+      console.log(req.body);
       const { _id, __v, ...rest } = req.body;
       resources = rest;
     }
@@ -26,7 +27,7 @@ const createResource = async (req, res) => {
   } catch (err) {
     res.status(400).json({
       status: "fail",
-      message: err,
+      message: err.message,
     });
   }
 };
@@ -44,7 +45,7 @@ const getAllResource = async (req, res) => {
   } catch (err) {
     res.status(400).json({
       status: "fail",
-      message: err,
+      message: err.message,
     });
   }
 };
@@ -68,7 +69,7 @@ const getById = async (req, res) => {
   } catch (err) {
     res.status(400).json({
       status: "fail",
-      message: err,
+      message: err.message,
     });
   }
 };
@@ -96,7 +97,7 @@ const updateById = async (req, res) => {
   } catch (err) {
     res.status(400).json({
       status: "fail",
-      message: err,
+      message: err.message,
     });
   }
 };
@@ -121,7 +122,7 @@ const deleteById = async (req, res) => {
   } catch (err) {
     res.status(400).json({
       status: "fail",
-      message: err,
+      message: err.message,
     });
   }
 };
