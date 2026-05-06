@@ -8,7 +8,7 @@ const createResource = async (req, res) => {
     if (Array.isArray(req.body)) {
       resources = req.body.map((resource) => {
         const { _id, __v, ...rest } = resource;
-        resources = rest;
+        return rest;
       });
     } else {
       const { _id, __v, ...rest } = req.body;

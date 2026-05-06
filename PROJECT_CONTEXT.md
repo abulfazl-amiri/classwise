@@ -42,26 +42,56 @@ A **backend REST API** — a teaching assistant that helps Amiri track and manag
 | Node.js + Express  | Server and routing              |
 | MongoDB + Mongoose | Database and models             |
 | dotenv             | Config / environment variables  |
+| Morgan             | HTTP request logging            |
 | Postman            | Testing the API (no UI for now) |
 
 ---
 
 ## Build order (follow this strictly)
 
-1. `server.js` — get the server running
-2. `app.js` — Express setup and middleware
-3. Routes + Controllers — basic REST API with dummy data
-4. MongoDB connection + Mongoose models
-5. Error handling
-6. Authentication (JWT)
+1. ✅ `server.js` — server running, MongoDB connected via Mongoose
+2. ✅ `app.js` — Express setup, middleware (morgan, express.json)
+3. ✅ Routes + Controllers — CRUD for Classes and Resources
+4. ✅ MongoDB connection + Mongoose models (Class.js, Resource.js)
+5. ✅ Error handling — 404 and 500 handlers done, tested in Postman
+6. 🔄 Authentication (JWT) — theory done, implementation next
 
 > **Do not skip ahead.** Each step must work before moving to the next.
 
 ---
 
+## Current file structure
+
+```
+classwise/
+├── app.js
+├── server.js
+├── package.json
+├── .env
+├── models/
+│   ├── Class.js
+│   └── Resource.js
+├── routes/
+│   ├── classRoutes.js
+│   └── resourceRoutes.js
+├── controllers/
+│   ├── classController.js
+│   └── resourceController.js
+└── dev/
+    └── script.js
+```
+
+---
+
 ## Where we are right now
 
-> check git history or review full code base
+**Step 6 – Authentication (JWT), starting next session.**
+
+- ✅ Amiri read jwt.io docs independently (no AI)
+- ✅ Understands: structure (header, payload, signature), signing vs encrypting, Bearer token in Authorization header
+- 🔄 Implementation not started yet
+
+**Next:** Install `jsonwebtoken` and `bcrypt`, create User model, build signup and login routes.
 
 ---
 

@@ -41,8 +41,16 @@ const classSchema = new mongoose.Schema({
     trim: true,
   },
 
-  lastTaughtDate: {
-    type: Schema.Types.Date,
+  lastSession: {
+    date: {
+      type: Schema.Types.Date,
+    },
+    note: {
+      type: String,
+    },
+    plan: {
+      type: String,
+    },
   },
 
   students: {
