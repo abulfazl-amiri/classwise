@@ -34,7 +34,23 @@ const createResource = async (req, res) => {
 
 const getAllResource = async (req, res) => {
   try {
-    const allResources = await Resource.find({});
+    // ["page", "limit", "fields", "sort"]
+    const { page, limit, fields, sort, ...queryObj } = req.query;
+
+    // Convert comparison operators to MongoDB syntax: e.g. { gte: '100' } -> { $gte: '100' }
+    for (let [key, val] of Object.entries(queryObj)) {
+      if (typeof val !== "object") continue;
+
+      queryObj[key] = Object.entries(val).reduce((acc, entry) => {
+        const [k, v] = entry;
+        if (v === undefined) return acc;
+        acc[`$${k}`] = v;
+        return acc;
+      }, {});
+    }
+
+    console.log(queryObj);
+    const allResources = await Resource.find(queryObj);
     res.status(200).json({
       status: "success",
       results: allResources.length,

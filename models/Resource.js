@@ -24,6 +24,10 @@ const resourceSchema = mongoose.Schema({
     required: [true, "Total Chapters is required"],
     min: [0, "Total units can not be less than 0"],
   },
+  level: {
+    type: String,
+    trim: true,
+  },
 });
 
 export default mongoose.model("Resource", resourceSchema);

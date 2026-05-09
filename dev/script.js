@@ -37,6 +37,9 @@ if (process.argv[2] === "--delete" && process.argv[3] === "--classes") {
 } else if (process.argv[2] === "--delete" && process.argv[3] === "--resources") {
   await deleteAllResources();
   process.exit();
+} else if (process.argv[2] === "--delete" && process.argv[3] === "--users") {
+  await deleteAllResources();
+  process.exit();
 } else {
   console.log(
     "Nothing to do!, please specify --delete  and --resource | --classes to delete all of them from db",

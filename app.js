@@ -7,8 +7,12 @@ import userRoutes from "./routes/userRoutes.js";
 
 const app = express();
 
+// middle wares
 app.use(express.json());
 app.use(morgan("dev"));
+
+// configurations
+app.set("query parser", "extended");
 
 app.use("/api/v1/classes", classRoutes);
 app.use("/api/v1/resources", resourceRoutes);
