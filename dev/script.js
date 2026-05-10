@@ -42,6 +42,7 @@ if (process.argv[2] === "--delete" && process.argv[3] === "--classes") {
   process.exit();
 } else {
   console.log(
-    "Nothing to do!, please specify --delete  and --resource | --classes to delete all of them from db",
+    "Please specify --delete with --resource | --classes | --users to delete all of them from db",
   );
+  process.exit();
 }

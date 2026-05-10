@@ -34,8 +34,7 @@ const createResource = async (req, res) => {
 
 const getAllResource = async (req, res) => {
   try {
-    // ["page", "limit", "fields", "sort"]
-    const { page, limit, fields, sort, ...queryObj } = req.query;
+    let { page, limit, fields, sort, ...queryObj } = req.query;
 
     // Convert comparison operators to MongoDB syntax: e.g. { gte: '100' } -> { $gte: '100' }
     for (let [key, val] of Object.entries(queryObj)) {
@@ -49,8 +48,28 @@ const getAllResource = async (req, res) => {
       }, {});
     }
 
-    console.log(queryObj);
-    const allResources = await Resource.find(queryObj);
+    let query = Resource.find(queryObj);
+
+    // sort
+    if (!sort) sort = "-createdAt";
+    sort = sort.split(",").join(" ");
+    query = query.sort(sort);
+
+    // select
+    if (!fields) fields = "-createdAt -updatedAt -__v";
+    fields = fields.split(",").join(" ");
+    query = query.select(fields);
+
+    // paginate
+    if (!limit) limit = 10;
+    limit = Number(limit);
+    query = query.limit(limit);
+    if (!page) page = 1;
+    page = Number(page);
+    query = query.skip(limit * (page - 1));
+
+    const allResources = await query;
+
     res.status(200).json({
       status: "success",
       results: allResources.length,
