@@ -1,4 +1,5 @@
 import Resource from "../models/Resource.js";
+import APIFeatures from "./../utils/apiFeatures.js";
 
 // ALIASES
 const aliasRecent = function (req, res, next) {
@@ -40,49 +41,17 @@ const createResource = async (req, res) => {
 
 const getAllResource = async (req, res) => {
   try {
-    let queryWithOverrides;
-    if (res.locals.queryOverrides) {
-      queryWithOverrides = { ...req.query, ...res.locals.queryOverrides };
-    } else {
-      queryWithOverrides = req.query;
-    }
-    console.log(queryWithOverrides);
+    let queryString = res.locals.queryOverrides
+      ? { ...req.query, ...res.locals.queryOverrides }
+      : req.query;
 
-    let { page, limit, fields, sort, ...queryObj } = queryWithOverrides;
+    const features = new APIFeatures(Resource.find({}), queryString)
+      .filter()
+      .sort()
+      .select()
+      .paginate();
 
-    // Convert comparison operators to MongoDB syntax: e.g. { gte: '100' } -> { $gte: '100' }
-    for (let [key, val] of Object.entries(queryObj)) {
-      if (typeof val !== "object") continue;
-
-      queryObj[key] = Object.entries(val).reduce((acc, entry) => {
-        const [k, v] = entry;
-        if (v === undefined) return acc;
-        acc[`$${k}`] = v;
-        return acc;
-      }, {});
-    }
-
-    let query = Resource.find(queryObj);
-
-    // sort
-    if (!sort) sort = "-createdAt";
-    sort = sort.split(",").join(" ");
-    query = query.sort(sort);
-
-    // select
-    if (!fields) fields = "-createdAt -updatedAt -__v";
-    fields = fields.split(",").join(" ");
-    query = query.select(fields);
-
-    // paginate
-    if (!limit) limit = 10;
-    limit = Number(limit);
-    query = query.limit(limit);
-    if (!page) page = 1;
-    page = Number(page);
-    query = query.skip(limit * (page - 1));
-
-    const allResources = await query;
+    const allResources = await features.query;
 
     res.status(200).json({
       status: "success",

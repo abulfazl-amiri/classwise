@@ -1,4 +1,5 @@
 import Class from "./../models/Class.js";
+import APIFeatures from "./../utils/apiFeatures.js";
 
 //// CRUD
 
@@ -34,7 +35,18 @@ const createClass = async (req, res) => {
 
 const getAllClasses = async (req, res) => {
   try {
-    const classes = await Class.find({});
+    let queryString = res.locals.queryOverrides
+      ? { ...req.query, ...res.locals.queryOverrides }
+      : req.query;
+
+    const features = new APIFeatures(Class.find({}), queryString)
+      .filter()
+      .sort()
+      .select()
+      .paginate();
+
+    const classes = await features.query;
+
     res.status(200).json({
       status: "success",
       results: classes.length,
