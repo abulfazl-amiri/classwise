@@ -1,5 +1,11 @@
 import Resource from "../models/Resource.js";
 
+// ALIASES
+const aliasRecent = function (req, res, next) {
+  res.locals.queryOverrides = { sort: "-createdAt", limit: 5 };
+  next();
+};
+
 // CRUD
 const createResource = async (req, res) => {
   try {
@@ -34,7 +40,15 @@ const createResource = async (req, res) => {
 
 const getAllResource = async (req, res) => {
   try {
-    let { page, limit, fields, sort, ...queryObj } = req.query;
+    let queryWithOverrides;
+    if (res.locals.queryOverrides) {
+      queryWithOverrides = { ...req.query, ...res.locals.queryOverrides };
+    } else {
+      queryWithOverrides = req.query;
+    }
+    console.log(queryWithOverrides);
+
+    let { page, limit, fields, sort, ...queryObj } = queryWithOverrides;
 
     // Convert comparison operators to MongoDB syntax: e.g. { gte: '100' } -> { $gte: '100' }
     for (let [key, val] of Object.entries(queryObj)) {
@@ -162,4 +176,4 @@ const deleteById = async (req, res) => {
   }
 };
 
-export { createResource, getAllResource, getById, updateById, deleteById };
+export { aliasRecent, createResource, getAllResource, getById, updateById, deleteById };
