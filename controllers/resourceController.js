@@ -145,4 +145,49 @@ const deleteById = async (req, res) => {
   }
 };
 
-export { aliasRecent, createResource, getAllResource, getById, updateById, deleteById };
+// AGGREGATIONS
+const findResourcesByLevel = async function (req, res) {
+  try {
+    const data = await Resource.aggregate([
+      { $match: { level: { $in: ["Beginner", "Intermediate", "Advanced"] } } },
+      {
+        $group: {
+          _id: "$level",
+          about: { $push: { name: "$name", author: "$author" } },
+          numOfResources: {
+            $sum: 1,
+          },
+        },
+      },
+      {
+        $project: {
+          level: "$_id",
+          quantity: "$numOfResources",
+          resource: "$about",
+          _id: 0,
+        },
+      },
+    ]);
+    res.status(200).json({
+      status: "success",
+      data: {
+        data: data,
+      },
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+};
+
+export {
+  aliasRecent,
+  createResource,
+  getAllResource,
+  getById,
+  updateById,
+  deleteById,
+  findResourcesByLevel,
+};

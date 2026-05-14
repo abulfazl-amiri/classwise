@@ -1,0 +1,389 @@
+[
+  {
+    "name": "First Friend 1",
+    "author": "Oxford University Press",
+    "totalPages": 95,
+    "totalUnits": 10,
+    "level": "Beginner",
+    "edition": 1
+  },
+  {
+    "name": "First Friend 1",
+    "author": "Oxford University Press",
+    "totalPages": 100,
+    "totalUnits": 10,
+    "level": "Beginner",
+    "edition": 2
+  },
+  {
+    "name": "First Friend 2",
+    "author": "Oxford University Press",
+    "totalPages": 102,
+    "totalUnits": 12,
+    "level": "Beginner",
+    "edition": 1
+  },
+  {
+    "name": "First Friend 2",
+    "author": "Oxford University Press",
+    "totalPages": 106,
+    "totalUnits": 12,
+    "level": "Beginner",
+    "edition": 2
+  },
+  {
+    "name": "First Friend 3",
+    "author": "Oxford University Press",
+    "totalPages": 110,
+    "totalUnits": 13,
+    "level": "Elementary",
+    "edition": 1
+  },
+  {
+    "name": "First Friend 3",
+    "author": "Oxford University Press",
+    "totalPages": 114,
+    "totalUnits": 13,
+    "level": "Elementary",
+    "edition": 2
+  },
+  {
+    "name": "Family and Friends Starter",
+    "author": "Oxford University Press",
+    "totalPages": 115,
+    "totalUnits": 14,
+    "level": "Starter",
+    "edition": 1
+  },
+  {
+    "name": "Family and Friends Starter",
+    "author": "Oxford University Press",
+    "totalPages": 118,
+    "totalUnits": 14,
+    "level": "Starter",
+    "edition": 2
+  },
+  {
+    "name": "Family and Friends 1",
+    "author": "Oxford University Press",
+    "totalPages": 120,
+    "totalUnits": 15,
+    "level": "Beginner",
+    "edition": 1
+  },
+  {
+    "name": "Family and Friends 1",
+    "author": "Oxford University Press",
+    "totalPages": 124,
+    "totalUnits": 15,
+    "level": "Beginner",
+    "edition": 2
+  },
+  {
+    "name": "Family and Friends 2",
+    "author": "Oxford University Press",
+    "totalPages": 128,
+    "totalUnits": 15,
+    "level": "Beginner",
+    "edition": 1
+  },
+  {
+    "name": "Family and Friends 2",
+    "author": "Oxford University Press",
+    "totalPages": 132,
+    "totalUnits": 15,
+    "level": "Beginner",
+    "edition": 2
+  },
+  {
+    "name": "Family and Friends 3",
+    "author": "Oxford University Press",
+    "totalPages": 135,
+    "totalUnits": 16,
+    "level": "Elementary",
+    "edition": 1
+  },
+  {
+    "name": "Family and Friends 3",
+    "author": "Oxford University Press",
+    "totalPages": 138,
+    "totalUnits": 16,
+    "level": "Elementary",
+    "edition": 2
+  },
+  {
+    "name": "Family and Friends 4",
+    "author": "Oxford University Press",
+    "totalPages": 142,
+    "totalUnits": 16,
+    "level": "Pre-Intermediate",
+    "edition": 1
+  },
+  {
+    "name": "Family and Friends 4",
+    "author": "Oxford University Press",
+    "totalPages": 146,
+    "totalUnits": 16,
+    "level": "Pre-Intermediate",
+    "edition": 2
+  },
+  {
+    "name": "Family and Friends 5",
+    "author": "Oxford University Press",
+    "totalPages": 150,
+    "totalUnits": 17,
+    "level": "Intermediate",
+    "edition": 1
+  },
+  {
+    "name": "Family and Friends 5",
+    "author": "Oxford University Press",
+    "totalPages": 154,
+    "totalUnits": 17,
+    "level": "Intermediate",
+    "edition": 2
+  },
+  {
+    "name": "Family and Friends 6",
+    "author": "Oxford University Press",
+    "totalPages": 158,
+    "totalUnits": 18,
+    "level": "Intermediate",
+    "edition": 1
+  },
+  {
+    "name": "Family and Friends 6",
+    "author": "Oxford University Press",
+    "totalPages": 162,
+    "totalUnits": 18,
+    "level": "Intermediate",
+    "edition": 2
+  },
+  {
+    "name": "Hip Hip Hooray! 1",
+    "author": "Pearson Education",
+    "totalPages": 90,
+    "totalUnits": 10,
+    "level": "Beginner",
+    "edition": 1
+  },
+  {
+    "name": "Hip Hip Hooray! 1",
+    "author": "Pearson Education",
+    "totalPages": 94,
+    "totalUnits": 10,
+    "level": "Beginner",
+    "edition": 2
+  },
+  {
+    "name": "Hip Hip Hooray! 2",
+    "author": "Pearson Education",
+    "totalPages": 98,
+    "totalUnits": 11,
+    "level": "Elementary",
+    "edition": 1
+  },
+  {
+    "name": "Hip Hip Hooray! 2",
+    "author": "Pearson Education",
+    "totalPages": 102,
+    "totalUnits": 11,
+    "level": "Elementary",
+    "edition": 2
+  },
+  {
+    "name": "Hip Hip Hooray! 3",
+    "author": "Pearson Education",
+    "totalPages": 104,
+    "totalUnits": 12,
+    "level": "Elementary",
+    "edition": 1
+  },
+  {
+    "name": "Hip Hip Hooray! 3",
+    "author": "Pearson Education",
+    "totalPages": 108,
+    "totalUnits": 12,
+    "level": "Elementary",
+    "edition": 2
+  },
+  {
+    "name": "Hip Hip Hooray! 4",
+    "author": "Pearson Education",
+    "totalPages": 112,
+    "totalUnits": 12,
+    "level": "Pre-Intermediate",
+    "edition": 1
+  },
+  {
+    "name": "Hip Hip Hooray! 4",
+    "author": "Pearson Education",
+    "totalPages": 116,
+    "totalUnits": 12,
+    "level": "Pre-Intermediate",
+    "edition": 2
+  },
+  {
+    "name": "Hip Hip Hooray! 5",
+    "author": "Pearson Education",
+    "totalPages": 118,
+    "totalUnits": 13,
+    "level": "Intermediate",
+    "edition": 1
+  },
+  {
+    "name": "Hip Hip Hooray! 5",
+    "author": "Pearson Education",
+    "totalPages": 122,
+    "totalUnits": 13,
+    "level": "Intermediate",
+    "edition": 2
+  },
+  {
+    "name": "Hip Hip Hooray! 6",
+    "author": "Pearson Education",
+    "totalPages": 126,
+    "totalUnits": 14,
+    "level": "Intermediate",
+    "edition": 1
+  },
+  {
+    "name": "Hip Hip Hooray! 6",
+    "author": "Pearson Education",
+    "totalPages": 130,
+    "totalUnits": 14,
+    "level": "Intermediate",
+    "edition": 2
+  },
+  {
+    "name": "American English File Starter",
+    "author": "Oxford University Press",
+    "totalPages": 130,
+    "totalUnits": 12,
+    "level": "Starter",
+    "edition": 1
+  },
+  {
+    "name": "American English File Starter",
+    "author": "Oxford University Press",
+    "totalPages": 134,
+    "totalUnits": 12,
+    "level": "Starter",
+    "edition": 2
+  },
+  {
+    "name": "American English File 1",
+    "author": "Oxford University Press",
+    "totalPages": 145,
+    "totalUnits": 12,
+    "level": "Beginner",
+    "edition": 1
+  },
+  {
+    "name": "American English File 1",
+    "author": "Oxford University Press",
+    "totalPages": 149,
+    "totalUnits": 12,
+    "level": "Beginner",
+    "edition": 2
+  },
+  {
+    "name": "American English File 2",
+    "author": "Oxford University Press",
+    "totalPages": 152,
+    "totalUnits": 12,
+    "level": "Elementary",
+    "edition": 1
+  },
+  {
+    "name": "American English File 2",
+    "author": "Oxford University Press",
+    "totalPages": 156,
+    "totalUnits": 12,
+    "level": "Elementary",
+    "edition": 2
+  },
+  {
+    "name": "American English File 3",
+    "author": "Oxford University Press",
+    "totalPages": 160,
+    "totalUnits": 10,
+    "level": "Pre-Intermediate",
+    "edition": 1
+  },
+  {
+    "name": "American English File 3",
+    "author": "Oxford University Press",
+    "totalPages": 164,
+    "totalUnits": 10,
+    "level": "Pre-Intermediate",
+    "edition": 2
+  },
+  {
+    "name": "American English File 4",
+    "author": "Oxford University Press",
+    "totalPages": 168,
+    "totalUnits": 10,
+    "level": "Upper-Intermediate",
+    "edition": 1
+  },
+  {
+    "name": "American English File 4",
+    "author": "Oxford University Press",
+    "totalPages": 172,
+    "totalUnits": 10,
+    "level": "Upper-Intermediate",
+    "edition": 2
+  },
+  {
+    "name": "American English File 5",
+    "author": "Oxford University Press",
+    "totalPages": 178,
+    "totalUnits": 12,
+    "level": "Advanced",
+    "edition": 1
+  },
+  {
+    "name": "American English File 5",
+    "author": "Oxford University Press",
+    "totalPages": 182,
+    "totalUnits": 12,
+    "level": "Advanced",
+    "edition": 2
+  },
+  {
+    "name": "JavaScript Basics",
+    "author": "Code Academy",
+    "totalPages": 310,
+    "totalUnits": 24,
+    "level": "Beginner"
+  },
+  {
+    "name": "Node.js Backend Development",
+    "author": "Alex Johnson",
+    "totalPages": 420,
+    "totalUnits": 30,
+    "level": "Advanced"
+  },
+  {
+    "name": "Computer Networking Fundamentals",
+    "author": "Michael Grant",
+    "totalPages": 260,
+    "totalUnits": 20,
+    "level": "Intermediate"
+  },
+  {
+    "name": "Algebra Essentials",
+    "author": "Sarah Mitchell",
+    "totalPages": 240,
+    "totalUnits": 18,
+    "level": "Intermediate"
+  },
+  {
+    "name": "Introduction to Physics",
+    "author": "Emily Carter",
+    "totalPages": 350,
+    "totalUnits": 22,
+    "level": "Intermediate"
+  }
+]

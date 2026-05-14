@@ -29,9 +29,16 @@ const resourceSchema = mongoose.Schema(
       type: String,
       trim: true,
     },
+    edition: {
+      type: Number,
+      trim: true,
+    },
   },
   {
     timestamps: true,
+
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   },
 );
 

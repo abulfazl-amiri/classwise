@@ -7,12 +7,14 @@ import {
   getById,
   updateById,
   deleteById,
+  findResourcesByLevel,
 } from "../controllers/resourceController.js";
 import { authenticate } from "../middleware/auth.js";
 
 const router = Router();
 
 router.route("/recent").get(authenticate, aliasRecent, getAllResource);
+router.route("/level-beginner").get(authenticate, findResourcesByLevel, getAllResource);
 
 router.route("/").post(authenticate, createResource).get(authenticate, getAllResource);
 router
