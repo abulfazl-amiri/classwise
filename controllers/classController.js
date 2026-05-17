@@ -1,6 +1,8 @@
 import Class from "./../models/Class.js";
 import APIFeatures from "./../utils/apiFeatures.js";
 
+import appError from "../utils/appError.js";
+
 //// CRUD
 
 const createClass = async (req, res) => {
@@ -26,10 +28,7 @@ const createClass = async (req, res) => {
       },
     });
   } catch (err) {
-    res.status(400).json({
-      status: "fail",
-      message: err.message,
-    });
+    throw new appError(err.message, 400);
   }
 };
 
@@ -55,10 +54,11 @@ const getAllClasses = async (req, res) => {
       },
     });
   } catch (err) {
-    res.status(400).json({
-      status: "fail",
-      message: err.message,
-    });
+    // res.status(400).json({
+    //   status: "fail",
+    //   message: err.message,
+    // });
+    throw new appError(err.message, 400);
   }
 };
 
@@ -66,11 +66,7 @@ const getById = async (req, res) => {
   try {
     const foundClass = await Class.findById(req.params.id);
     if (!foundClass) {
-      res.status(404).json({
-        status: "error",
-        message: "Class not found",
-      });
-      return;
+      throw new appError("Class not found", 404);
     }
     res.status(200).json({
       status: "success",
@@ -79,10 +75,7 @@ const getById = async (req, res) => {
       },
     });
   } catch (err) {
-    res.status(400).json({
-      status: "fail",
-      message: err.message,
-    });
+    throw new appError(err.message, 400);
   }
 };
 
@@ -94,11 +87,7 @@ const updateById = async (req, res) => {
     });
 
     if (!updatedClass) {
-      res.status(404).json({
-        status: "error",
-        message: "Class not found",
-      });
-      return;
+      throw new appError("Class not found", 404);
     }
     res.status(200).json({
       status: "success",
@@ -107,10 +96,7 @@ const updateById = async (req, res) => {
       },
     });
   } catch (err) {
-    res.status(400).json({
-      status: "fail",
-      message: err.message,
-    });
+    throw new appError(err.message, 400);
   }
 };
 
@@ -131,10 +117,7 @@ const deleteById = async (req, res) => {
       },
     });
   } catch (err) {
-    res.status(400).json({
-      status: "fail",
-      message: err.message,
-    });
+    throw new appError(err.message, 400);
   }
 };
 

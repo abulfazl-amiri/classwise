@@ -1,6 +1,8 @@
 import Resource from "../models/Resource.js";
 import APIFeatures from "./../utils/apiFeatures.js";
 
+import appError from "./../utils/appError.js";
+
 // ALIASES
 const aliasRecent = function (req, res, next) {
   res.locals.queryOverrides = { sort: "-createdAt", limit: 5 };
@@ -32,10 +34,7 @@ const createResource = async (req, res) => {
       },
     });
   } catch (err) {
-    res.status(400).json({
-      status: "fail",
-      message: err.message,
-    });
+    throw new appError(err.message, 400);
   }
 };
 
@@ -61,10 +60,7 @@ const getAllResource = async (req, res) => {
       },
     });
   } catch (err) {
-    res.status(400).json({
-      status: "fail",
-      message: err.message,
-    });
+    throw new appError(err.message, 400);
   }
 };
 
@@ -72,11 +68,7 @@ const getById = async (req, res) => {
   try {
     const foundResource = await Resource.findById(req.params.id); // parsing from /:id in the url
     if (!foundResource) {
-      res.status(404).json({
-        status: "fail",
-        message: "Resource not found",
-      });
-      return;
+      throw new appError("Resource not found", 404);
     }
     res.status(200).json({
       status: "success",
@@ -85,38 +77,28 @@ const getById = async (req, res) => {
       },
     });
   } catch (err) {
-    res.status(400).json({
-      status: "fail",
-      message: err.message,
-    });
+    throw new appError(err.message, 400);
   }
 };
 
 const updateById = async (req, res) => {
   try {
-    const foundResource = await Resource.findByIdAndUpdate(req.params.id, req.body, {
+    const updatedResource = await Resource.findByIdAndUpdate(req.params.id, req.body, {
       returnDocument: "after",
       runValidators: true,
     });
 
-    if (!foundResource) {
-      res.status(404).json({
-        status: "fail",
-        message: "Resource not found",
-      });
-      return;
+    if (!updatedResource) {
+      throw new appError("Resource not found", 404);
     }
     res.status(200).json({
       status: "success",
       data: {
-        resources: foundResource,
+        resources: updatedResource,
       },
     });
   } catch (err) {
-    res.status(400).json({
-      status: "fail",
-      message: err.message,
-    });
+    throw new appError(err.message, 400);
   }
 };
 
@@ -125,11 +107,7 @@ const deleteById = async (req, res) => {
     const deletedResource = await Resource.findByIdAndDelete(req.params.id);
 
     if (!deletedResource) {
-      res.status(404).json({
-        status: "fail",
-        message: "Resource not found",
-      });
-      return;
+      throw new appError("Resource not found", 404);
     }
     res.status(204).json({
       status: "success",
@@ -138,10 +116,7 @@ const deleteById = async (req, res) => {
       },
     });
   } catch (err) {
-    res.status(400).json({
-      status: "fail",
-      message: err.message,
-    });
+    throw new appError(err.message, 400);
   }
 };
 
@@ -149,7 +124,7 @@ const deleteById = async (req, res) => {
 const findResourcesByLevel = async function (req, res) {
   try {
     const data = await Resource.aggregate([
-      { $match: { level: { $in: ["Beginner", "Intermediate", "Advanced"] } } },
+      { $match: { level: { $in: ["Beginner"] } } },
       {
         $group: {
           _id: "$level",
@@ -175,10 +150,7 @@ const findResourcesByLevel = async function (req, res) {
       },
     });
   } catch (err) {
-    res.status(400).json({
-      status: "fail",
-      message: err.message,
-    });
+    throw new appError(err.message, 400);
   }
 };
 

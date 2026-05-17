@@ -5,6 +5,8 @@ import classRoutes from "./routes/classRoutes.js";
 import resourceRoutes from "./routes/resourceRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 
+import appError from "./utils/appError.js";
+
 const app = express();
 
 // middle wares
@@ -19,14 +21,16 @@ app.use("/api/v1/resources", resourceRoutes);
 app.use("/api/v1/auth", userRoutes);
 
 // invalid routes
-app.use("*", (req, res, next) => {
+app.use((req, res, next) => {
   // res.status(404).json({
   //   status: "error",
   //   message: `Could not find endpoint '${req.originalUrl}' on the available endpoints`,
   // });
 
-  const err = new Error(`Could not find endpoint '${req.originalUrl}' on the available endpoints`);
-  err.statuCode = 404;
+  const err = new appError(
+    `Could not find endpoint '${req.originalUrl}' on the available endpoints`,
+  );
+  err.statusCode = 404;
   err.status = "fail";
   next(err);
 });

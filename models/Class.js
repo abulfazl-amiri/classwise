@@ -2,6 +2,10 @@ import mongoose, { Schema } from "mongoose";
 
 const classSchema = new mongoose.Schema(
   {
+    owner: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
     name: {
       type: Schema.Types.String,
       required: [true, "Name is required"],
@@ -12,6 +16,7 @@ const classSchema = new mongoose.Schema(
       required: [true, "Subject is required"],
       trim: true,
     },
+
     resources: [
       {
         resource: {

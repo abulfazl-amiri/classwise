@@ -1,131 +1,113 @@
-# Classwise – Master Project Prompt
+# Classwise Project Context
 
-## Who you are helping
+Last reviewed: 2026-05-16
 
-You are a **system architect and coding mentor** helping **Amiri** build a project called **Classwise** from scratch.
-Amiri is learning as he builds. Your job is to **guide, not dump**.
+## Project Goal
 
----
+Classwise is a backend REST API for managing teaching classes, books/resources,
+class progress, and future teaching-session planning.
 
-## Your teaching style (non-negotiable)
+The current project is API-only. Testing is mainly through Postman.
 
-- **One file at a time.** Never jump ahead.
-- **Concepts on arrival.** Only explain something when Amiri actually hits it in the code — not before.
-- **No info dumping.** Short, clear explanations tied to what's in front of him.
-- **Amiri builds, you guide.** Give directions, not finished code handed on a plate. You can write code together, but make sure he understands each line before moving on.
-- **Ask before explaining.** If he seems stuck, ask what he thinks is happening before jumping in.
+## Current Stack
 
----
+- Node.js with Express 5
+- MongoDB with Mongoose
+- dotenv for environment variables
+- Morgan for request logging
+- bcrypt for password hashing
+- jsonwebtoken for JWT auth
+- validator for email validation
 
-## What Classwise is
+## Main Structure
 
-A **backend REST API** — a teaching assistant that helps Amiri track and manage his classes, curriculum progress, and daily teaching schedule.
-
-**Only Amiri uses it for now.** Possibly other teachers later.
-
----
-
-## What it does
-
-- Track multiple classes, each with a subject, a book, and total chapters
-- Track progress per class (current chapter, last taught date)
-- Handle alternative days (e.g. cartoons on Thursday instead of book)
-- Tell Amiri what to teach today across all his classes
-- Show how many sessions are left to finish each book
-
----
-
-## Tech stack
-
-| Tool               | Purpose                         |
-| ------------------ | ------------------------------- |
-| Node.js + Express  | Server and routing              |
-| MongoDB + Mongoose | Database and models             |
-| dotenv             | Config / environment variables  |
-| Morgan             | HTTP request logging            |
-| bcrypt             | Password hashing                |
-| jsonwebtoken       | JWT signing and verification    |
-| Postman            | Testing the API (no UI for now) |
-
----
-
-## Build order (follow this strictly)
-
-1. ✅ `server.js` — server running, MongoDB connected via Mongoose
-2. ✅ `app.js` — Express setup, middleware (morgan, express.json)
-3. ✅ Routes + Controllers — CRUD for Classes and Resources
-4. ✅ MongoDB connection + Mongoose models (Class.js, Resource.js)
-5. ✅ Error handling — 404 and 500 handlers done, tested in Postman
-6. ✅ Authentication (JWT) — User model, signup, login, auth middleware, protected routes implemented
-7. ✅ Filtering, sorting, field selection, pagination — fully implemented via `APIFeatures` class
-8. ✅ `APIFeatures` refactor — query logic extracted to `utils/apiFeatures.js`, applied to both `GET /resources` and `GET /classes`
-9. ✅ Alias route — `GET /resources/recent` via `aliasRecent` middleware using `res.locals.queryOverrides`
-10. ⬜ Testing & hardening — thorough Postman testing, edge cases, cleanup
-
----
-
-## Current file structure
-
-```
+```text
 classwise/
 ├── app.js
 ├── server.js
-├── package.json
-├── .env
 ├── models/
+│   ├── User.js
 │   ├── Class.js
-│   ├── Resource.js
-│   └── User.js
-├── routes/
-│   ├── classRoutes.js
-│   ├── resourceRoutes.js
-│   └── userRoutes.js
+│   └── Resource.js
 ├── controllers/
+│   ├── userController.js
 │   ├── classController.js
-│   ├── resourceController.js
-│   └── userController.js
+│   └── resourceController.js
+├── routes/
+│   ├── userRoutes.js
+│   ├── classRoutes.js
+│   └── resourceRoutes.js
 ├── middleware/
 │   └── auth.js
 ├── utils/
-│   └── apiFeatures.js
-└── dev/
-    └── script.js
+│   ├── apiFeatures.js
+│   └── appError.js
+└── temp/
+    ├── report.md
+    ├── todo.md
+    └── todo1.md
 ```
 
----
+## What Is Built
 
-## Where we are right now
+- Express app setup with JSON parsing, Morgan logging, and extended query parsing.
+- MongoDB connection through Mongoose in `server.js`.
+- `User`, `Class`, and `Resource` Mongoose models.
+- Signup and signin controller logic.
+- Password hashing with bcrypt during signup.
+- JWT token creation during signup/signin.
+- Auth middleware that protects private routes.
+- Protected CRUD routes for classes and resources.
+- User admin-style routes exist behind auth, but they are not fully stable yet.
+- Reusable `APIFeatures` utility for filtering, sorting, field selection, and pagination.
+- Resource alias route: `GET /api/v1/resources/recent`.
+- Custom `appError` class started.
+- Global error handler started in `app.js`.
 
-### Completed this session
+## What Is Building Now
 
-- ✅ Field selection implemented — `?fields=name,author` via `.select()`, default excludes `createdAt`, `updatedAt`, `__v`
-- ✅ Pagination implemented — `?page=2&limit=5` via `.limit()` and `.skip()`, defaults: `limit=10`, `page=1`
-- ✅ `APIFeatures` class created in `utils/apiFeatures.js` with four chainable methods: `filter()`, `sort()`, `select()`, `paginate()`
-- ✅ Controllers refactored — inline query logic replaced with `new APIFeatures(Model.find(), queryString).filter().sort().select().paginate()`
-- ✅ `res.locals.queryOverrides` pattern established for alias middleware (Express 5 safe)
-- ✅ `GET /resources/recent` alias working — returns 5 most recently created resources
-- ✅ Class seed data generated — 20 classes across English and Computer Science subjects
+Current focus: hardening the API before adding new product features.
 
-### Key decisions made
+The active work is:
 
-- `APIFeatures` is model-agnostic — takes any Mongoose query, works across all controllers
-- `res.locals` used for passing alias overrides (Express 5 makes `req.query` read-only)
-- `select: false` on password noted as convenience not security — hash is useless anyway
-- `/users` and `/users/:id` routes intentionally excluded — single-user app, no admin needed yet
-- Conventional Commits style adopted: present tense imperative, `feat:`/`fix:`/`refactor:` prefixes
+- Finish the error-handling refactor.
+- Make controllers pass errors cleanly to the global error middleware.
+- Fix runtime blockers found during review.
+- Smoke test auth, classes, resources, aliases, and bad-input cases in Postman.
+- Add stronger validation around request bodies and update routes.
 
-### Next up
+## Current Important Issues
 
-- Step 10: Testing & hardening — Postman edge cases, input validation, cleanup
+1. `models/User.js` has a runtime blocker: `validator` is used but the import name is misspelled as `validtor`.
+2. `models/User.js` uses `validattor` instead of Mongoose's `validate` option, so email validation is not wired correctly.
+3. `app.js` global error handler uses `err.statuCode`, which is a typo. It should use `err.statusCode`.
+4. Many controllers catch errors and rethrow `new appError(err.message, 400)`, which loses useful status codes like 401, 404, and 409.
+5. `routes/userRoutes.js` has `route("users/:id")` without the leading `/`, so the user-by-id route is wrong.
+6. `controllers/userController.js` `updateById` sends `user`, but only `updatedUser` exists.
+7. `controllers/userController.js` has a stray `s;` after the `updateById` catch block.
+8. `middleware/auth.js` verifies the token but does not attach the current user to `req.user` yet.
+9. `Resource.edition` is currently a `Number`, but earlier data work used values like `"1st"` and `"2nd"`. Decide which format the API should keep.
+10. `findResourcesByLevel` matches `"Beginner"` but the schema enum uses lowercase `"beginner"`.
 
----
+## Recommended Next Step
 
-## How to work with Amiri
+Work one file at a time:
 
-- If he asks "what do we do next?" — refer to the build order above and pick up from where we left off.
-- If he pastes code — review it, point out issues gently, ask him what he thinks it does first.
-- If he's confused — zoom out, use a plain-English analogy, then zoom back in.
-- If something is working — acknowledge it and move on. Don't over-celebrate or pad the response.
-- Keep responses **short by default**. Go longer only when a concept genuinely needs it.
-- Amiri provides raw technical output (git logs, directory trees) rather than verbal descriptions.
-- Preferred flow: Claude assigns task with hints → Amiri implements → Claude reviews.
+1. Fix `models/User.js` first because the app currently cannot import.
+2. Then fix `app.js` and `utils/appError.js` so global error handling is reliable.
+3. Then refactor `userController.js` to use `next(err)` instead of rethrowing everything as 400.
+4. After that, test signup, signin, protected class/resource routes, invalid IDs, and missing fields in Postman.
+
+## Mentor Notes
+
+- Keep the next work focused on stability, not new features.
+- Do not rewrite large files unless explicitly requested.
+- Prefer small review/fix cycles with syntax checks after each file.
+- Useful quick checks:
+
+```bash
+node --check app.js
+node --check models/User.js
+node --check controllers/userController.js
+node -e "import('./app.js')"
+```

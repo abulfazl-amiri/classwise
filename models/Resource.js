@@ -1,7 +1,11 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const resourceSchema = mongoose.Schema(
   {
+    owner: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
     name: {
       type: String,
       trim: true,
@@ -27,6 +31,14 @@ const resourceSchema = mongoose.Schema(
     },
     level: {
       type: String,
+      enum: [
+        "beginner",
+        "pre-intermediate",
+        "intermediate",
+        "upper-intermediate",
+        "advanced",
+        "general",
+      ],
       trim: true,
     },
     edition: {

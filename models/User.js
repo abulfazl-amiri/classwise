@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import validtor from "validator";
 
 const userSchema = mongoose.Schema(
   {
@@ -8,6 +9,7 @@ const userSchema = mongoose.Schema(
       trim: true,
       unique: true,
       lowercase: true,
+      validattor: validator.isEmail,
     },
     username: {
       type: String,
@@ -20,6 +22,11 @@ const userSchema = mongoose.Schema(
       trim: true,
       required: [true, "Password is required"],
       minLength: [8, "Passwords can not be less than 8 carachters"],
+    },
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user",
     },
   },
   { timestamps: true },
