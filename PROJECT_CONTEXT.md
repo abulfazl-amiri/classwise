@@ -38,7 +38,7 @@ classwise/
 │   ├── classRoutes.js
 │   └── resourceRoutes.js
 ├── middleware/
-│   └── auth.js
+│   └── authMiddleware.js
 ├── utils/
 │   ├── apiFeatures.js
 │   └── appError.js
@@ -81,13 +81,14 @@ The active work is:
 1. `models/User.js` has a runtime blocker: `validator` is used but the import name is misspelled as `validtor`.
 2. `models/User.js` uses `validattor` instead of Mongoose's `validate` option, so email validation is not wired correctly.
 3. `app.js` global error handler uses `err.statuCode`, which is a typo. It should use `err.statusCode`.
-4. Many controllers catch errors and rethrow `new appError(err.message, 400)`, which loses useful status codes like 401, 404, and 409.
+4. Controllers now pass caught errors to `next(err)`, but the global error response still needs cleanup so internal error messages are not leaked to clients.
 5. `routes/userRoutes.js` has `route("users/:id")` without the leading `/`, so the user-by-id route is wrong.
 6. `controllers/userController.js` `updateById` sends `user`, but only `updatedUser` exists.
 7. `controllers/userController.js` has a stray `s;` after the `updateById` catch block.
-8. `middleware/auth.js` verifies the token but does not attach the current user to `req.user` yet.
+8. `middleware/authMiddleware.js` verifies the token but does not attach the current user to `req.user` yet.
 9. `Resource.edition` is currently a `Number`, but earlier data work used values like `"1st"` and `"2nd"`. Decide which format the API should keep.
 10. `findResourcesByLevel` matches `"Beginner"` but the schema enum uses lowercase `"beginner"`.
+11. Follow up on global error responses: raw database, validation, or server error messages can leak sensitive implementation details. Later, split trusted `appError` messages from generic internal errors before returning JSON to clients.
 
 ## Recommended Next Step
 
@@ -95,7 +96,7 @@ Work one file at a time:
 
 1. Fix `models/User.js` first because the app currently cannot import.
 2. Then fix `app.js` and `utils/appError.js` so global error handling is reliable.
-3. Then refactor `userController.js` to use `next(err)` instead of rethrowing everything as 400.
+3. Then finish sanitizing global error responses so unknown/internal errors return a generic client message.
 4. After that, test signup, signin, protected class/resource routes, invalid IDs, and missing fields in Postman.
 
 ## Mentor Notes

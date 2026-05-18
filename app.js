@@ -37,6 +37,10 @@ app.use((req, res, next) => {
 
 // server error
 app.use((err, req, res, next) => {
+  console.log(err);
+  if (err.name === "ValidationError") {
+    err.statusCode = 422;
+  }
   err.statuCode = err.statusCode || 500;
   err.status = err.status || "error";
 

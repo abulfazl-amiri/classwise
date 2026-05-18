@@ -9,7 +9,7 @@ import {
   deleteById,
   findResourcesByLevel,
 } from "../controllers/resourceController.js";
-import { authenticate } from "../middleware/auth.js";
+import { authenticate } from "../middleware/authMiddleware.js";
 
 const router = Router();
 

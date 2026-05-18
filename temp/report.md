@@ -47,7 +47,7 @@ node --check models/Resource.js
 node --check controllers/userController.js
 node --check controllers/classController.js
 node --check controllers/resourceController.js
-node --check middleware/auth.js
+node --check middleware/authMiddleware.js
 node --check utils/apiFeatures.js
 node --check utils/appError.js
 node --check routes/userRoutes.js

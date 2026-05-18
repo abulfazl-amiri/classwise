@@ -10,7 +10,7 @@ const aliasRecent = function (req, res, next) {
 };
 
 // CRUD
-const createResource = async (req, res) => {
+const createResource = async (req, res, next) => {
   try {
     // filtering for _id and __v to not let client create their own ones
     let resources;
@@ -34,17 +34,17 @@ const createResource = async (req, res) => {
       },
     });
   } catch (err) {
-    throw new appError(err.message, 400);
+    next(err);
   }
 };
 
-const getAllResource = async (req, res) => {
+const getAllResource = async (req, res, next) => {
   try {
     let queryString = res.locals.queryOverrides
       ? { ...req.query, ...res.locals.queryOverrides }
       : req.query;
 
-    const features = new APIFeatures(Resource.find({}), queryString)
+    const features = new APIFeatures(Resource.find({ owner: req.user.id }), queryString)
       .filter()
       .sort()
       .select()
@@ -60,13 +60,13 @@ const getAllResource = async (req, res) => {
       },
     });
   } catch (err) {
-    throw new appError(err.message, 400);
+    next(err);
   }
 };
 
-const getById = async (req, res) => {
+const getById = async (req, res, next) => {
   try {
-    const foundResource = await Resource.findById(req.params.id); // parsing from /:id in the url
+    const foundResource = await Resource.findOne({ _id: req.params.id, owner: req.user.id });
     if (!foundResource) {
       throw new appError("Resource not found", 404);
     }
@@ -77,16 +77,20 @@ const getById = async (req, res) => {
       },
     });
   } catch (err) {
-    throw new appError(err.message, 400);
+    next(err);
   }
 };
 
-const updateById = async (req, res) => {
+const updateById = async (req, res, next) => {
   try {
-    const updatedResource = await Resource.findByIdAndUpdate(req.params.id, req.body, {
-      returnDocument: "after",
-      runValidators: true,
-    });
+    const updatedResource = await Resource.findOneAndUpdate(
+      { _id: req.params.id, owner: req.user.id },
+      req.body,
+      {
+        returnDocument: "after",
+        runValidators: true,
+      },
+    );
 
     if (!updatedResource) {
       throw new appError("Resource not found", 404);
@@ -98,13 +102,16 @@ const updateById = async (req, res) => {
       },
     });
   } catch (err) {
-    throw new appError(err.message, 400);
+    next(err);
   }
 };
 
-const deleteById = async (req, res) => {
+const deleteById = async (req, res, next) => {
   try {
-    const deletedResource = await Resource.findByIdAndDelete(req.params.id);
+    const deletedResource = await Resource.findOneAndDelete({
+      _id: req.params.id,
+      owner: req.user.id,
+    });
 
     if (!deletedResource) {
       throw new appError("Resource not found", 404);
@@ -116,12 +123,12 @@ const deleteById = async (req, res) => {
       },
     });
   } catch (err) {
-    throw new appError(err.message, 400);
+    next(err);
   }
 };
 
 // AGGREGATIONS
-const findResourcesByLevel = async function (req, res) {
+const findResourcesByLevel = async function (req, res, next) {
   try {
     const data = await Resource.aggregate([
       { $match: { level: { $in: ["Beginner"] } } },
@@ -150,7 +157,7 @@ const findResourcesByLevel = async function (req, res) {
       },
     });
   } catch (err) {
-    throw new appError(err.message, 400);
+    next(err);
   }
 };
 

@@ -8,7 +8,7 @@ import {
   deleteById,
 } from "../controllers/classController.js";
 
-import { authenticate } from "../middleware/auth.js";
+import { authenticate } from "../middleware/authMiddleware.js";
 const router = Router();
 
 router.route("/").post(authenticate, createClass).get(authenticate, getAllClasses);

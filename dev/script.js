@@ -1,8 +1,10 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv/config.js";
 import express from "express";
+
 import Class from "../models/Class.js";
 import Resource from "../models/Resource.js";
+import User from "../models/User.js";
 
 try {
   await mongoose.connect(process.env.MONGO_URI);
@@ -31,6 +33,15 @@ const deleteAllResources = async function () {
   }
 };
 
+const deleteAllUsers = async function () {
+  try {
+    await User.deleteMany({}); // {}: match all documents in the collection
+    console.log("All the users deleted successfully");
+  } catch (err) {
+    console.err(err);
+  }
+};
+
 if (process.argv[2] === "--delete" && process.argv[3] === "--classes") {
   await deleteAllClasses();
   process.exit();
@@ -38,7 +49,7 @@ if (process.argv[2] === "--delete" && process.argv[3] === "--classes") {
   await deleteAllResources();
   process.exit();
 } else if (process.argv[2] === "--delete" && process.argv[3] === "--users") {
-  await deleteAllResources();
+  await deleteAllUsers();
   process.exit();
 } else {
   console.log(

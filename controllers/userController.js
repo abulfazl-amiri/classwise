@@ -19,7 +19,7 @@ const createJWTToken = function (userId) {
   });
 };
 
-const signup = async function (req, res) {
+const signup = async function (req, res, next) {
   try {
     if (Array.isArray(req.body)) {
       throw new appError("Multi account creation was detected", 400);
@@ -40,7 +40,12 @@ const signup = async function (req, res) {
     // hashin the passwords
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    const user = await User.create({ username: username, email: email, password: hashedPassword });
+    const user = await User.create({
+      username: username,
+      email: email,
+      password: hashedPassword,
+      role: "user",
+    });
 
     // create the token
     const token = createJWTToken(user._id);
@@ -52,11 +57,11 @@ const signup = async function (req, res) {
       },
     });
   } catch (err) {
-    throw new appError(err.message, 400);
+    next(err);
   }
 };
 
-const signin = async function (req, res) {
+const signin = async function (req, res, next) {
   try {
     if (Array.isArray(req.body)) {
       throw new appError("Multi account sign in was detected", 400);
@@ -65,7 +70,7 @@ const signin = async function (req, res) {
     if (!isProvided(email, password)) {
       throw new appError("Email or Password is missing.", 400);
     }
-    const foundUser = await User.findOne({ email: email });
+    const foundUser = await User.findOne({ email: email }).select("+password");
 
     if (!foundUser) {
       throw new appError("Email or password was incorrect", 401);
@@ -87,11 +92,11 @@ const signin = async function (req, res) {
       },
     });
   } catch (err) {
-    throw new appError(err.message, 400);
+    next(err);
   }
 };
 
-const getAllUsers = async function (req, res) {
+const getAllUsers = async function (req, res, next) {
   try {
     const queryString = res.locals.queryOverrides
       ? { ...req.query, ...res.locals.queryOverrides }
@@ -113,11 +118,11 @@ const getAllUsers = async function (req, res) {
       },
     });
   } catch (err) {
-    throw new appError(err.message, 400);
+    next(err);
   }
 };
 
-const getById = async function (req, res) {
+const getById = async function (req, res, next) {
   try {
     const user = await User.findById(req.params.id);
     if (!user) {
@@ -130,17 +135,17 @@ const getById = async function (req, res) {
       },
     });
   } catch (err) {
-    throw new appError(err.message, 400);
+    next(err);
   }
 };
 
-const updateById = async function (req, res) {
+const updateById = async function (req, res, next) {
   try {
-    const { _id, username, password, email } = req.body;
+    const { _id, username, password, email, role } = req.body;
 
     const updatedUser = await User.findByIdAndUpdate(
       req.params.id,
-      { _id, username, password, email },
+      { username, email }, // do not include _id, role or password
       {
         returnDocument: "after",
         runValidators: true,
@@ -156,12 +161,12 @@ const updateById = async function (req, res) {
       },
     });
   } catch (err) {
-    throw new appError(err.message, 400);
+    next(err);
   }
   s;
 };
 
-const deleteById = async function (req, res) {
+const deleteById = async function (req, res, next) {
   try {
     const deletedUser = await User.findByIdAndDelete(req.params.id);
     if (!deletedUser) {
@@ -174,7 +179,7 @@ const deleteById = async function (req, res) {
       },
     });
   } catch (err) {
-    throw new appError(err.message, 400);
+    next(err);
   }
 };
 
