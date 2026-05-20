@@ -37,13 +37,13 @@ const signup = async function (req, res, next) {
       throw new appError("Email is already in use", 409);
     }
 
-    // hashin the passwords
-    const hashedPassword = await bcrypt.hash(password, 12);
+    // hashin the passwords done in the Model
+    // const hashedPassword = await bcrypt.hash(password, 12);
 
     const user = await User.create({
       username: username,
       email: email,
-      password: hashedPassword,
+      password: password,
       role: "user",
     });
 
@@ -77,7 +77,7 @@ const signin = async function (req, res, next) {
     }
 
     // checks the password
-    const passMatches = await bcrypt.compare(password, foundUser.password);
+    const passMatches = await foundUser.compare(password, foundUser.password);
     if (!passMatches) {
       throw new appError("Email or password was incorrect", 401);
     }
@@ -113,6 +113,7 @@ const getAllUsers = async function (req, res, next) {
     }
     res.status(200).json({
       status: "success",
+      results: users.length,
       data: {
         users: users,
       },
@@ -141,11 +142,11 @@ const getById = async function (req, res, next) {
 
 const updateById = async function (req, res, next) {
   try {
-    const { _id, username, password, email, role } = req.body;
+    const { username, email } = req.body;
 
     const updatedUser = await User.findByIdAndUpdate(
       req.params.id,
-      { username, email }, // do not include _id, role or password
+      { username, email },
       {
         returnDocument: "after",
         runValidators: true,
@@ -157,13 +158,12 @@ const updateById = async function (req, res, next) {
     res.status(200).json({
       status: "success",
       data: {
-        user: user,
+        user: updatedUser,
       },
     });
   } catch (err) {
     next(err);
   }
-  s;
 };
 
 const deleteById = async function (req, res, next) {
@@ -183,4 +183,26 @@ const deleteById = async function (req, res, next) {
   }
 };
 
-export { signup, signin, getAllUsers, getById, updateById, deleteById };
+const updateUsreRole = async function (req, res, next) {
+  try {
+    const { role } = req.body;
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: req.params.id },
+      { role: role },
+      {
+        returnDocument: "after",
+        runValidators: true,
+      },
+    );
+    res.status(200).json({
+      status: "success",
+      data: {
+        user: updatedUser,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export { signup, signin, getAllUsers, getById, updateById, deleteById, updateUsreRole };

@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import validator from "validator";
+import bcrypt from "bcrypt";
 
 const userSchema = mongoose.Schema(
   {
@@ -24,7 +25,7 @@ const userSchema = mongoose.Schema(
       type: String,
       trim: true,
       required: [true, "Password is required"],
-      minLength: [8, "Passwords can not be less than 8 carachters"],
+      minLength: [8, "Passwords can not be less than 8 characters"],
       select: false,
     },
     role: {
@@ -35,5 +36,22 @@ const userSchema = mongoose.Schema(
   },
   { timestamps: true },
 );
+
+userSchema.pre("save", async function () {
+  if (this.isModified("password")) {
+    this.password = await bcrypt.hash(this.password, 12);
+  }
+});
+
+// ! fix
+// userSchema.pre("findOneAndUpdate", async function () {
+//   if (this.isModified("password")) {
+//     this.password = await bcrypt.hash(this.password, 12);
+//   }
+// });
+
+userSchema.methods.comparePassword = async function (candidatePassword) {
+  return await bcrypt.compare(candidatePassword, this.password);
+};
 
 export default mongoose.model("User", userSchema);
