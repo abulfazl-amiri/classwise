@@ -8,6 +8,7 @@ import {
   updateById,
   deleteById,
   updateUsreRole,
+  updateUserPassword,
 } from "../controllers/userController.js";
 import { authenticate, restrictTo, setMeId } from "../middleware/authMiddleware.js";
 
@@ -29,5 +30,6 @@ router
   .get(authenticate, setMeId, getById)
   .patch(authenticate, setMeId, updateById)
   .delete(authenticate, setMeId, deleteById);
+router.route("/me/change-password").patch(authenticate, updateUserPassword);
 
 export default router;

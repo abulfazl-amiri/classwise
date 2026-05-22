@@ -12,13 +12,6 @@ const isProvided = function (...fields) {
   return true;
 };
 
-const createJWTToken = function (userId) {
-  return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
-    algorithm: "HS256",
-    expiresIn: process.env.JWT_EXPIRES_IN,
-  });
-};
-
 const signup = async function (req, res, next) {
   try {
     if (Array.isArray(req.body)) {
@@ -48,13 +41,11 @@ const signup = async function (req, res, next) {
     });
 
     // create the token
-    const token = createJWTToken(user._id);
+    const token = user.createToken();
 
     res.status(200).json({
       status: "success",
-      data: {
-        token: token,
-      },
+      token: token,
     });
   } catch (err) {
     next(err);
@@ -77,19 +68,17 @@ const signin = async function (req, res, next) {
     }
 
     // checks the password
-    const passMatches = await foundUser.compare(password, foundUser.password);
+    const passMatches = await foundUser.comparePassword(password, foundUser.password);
     if (!passMatches) {
       throw new appError("Email or password was incorrect", 401);
     }
 
     // create token
-    const token = createJWTToken(foundUser._id);
+    const token = foundUser.createToken();
 
     res.status(200).json({
       status: "success",
-      data: {
-        token: token,
-      },
+      token: token,
     });
   } catch (err) {
     next(err);
@@ -205,4 +194,38 @@ const updateUsreRole = async function (req, res, next) {
   }
 };
 
-export { signup, signin, getAllUsers, getById, updateById, deleteById, updateUsreRole };
+const updateUserPassword = async function (req, res, next) {
+  try {
+    const { oldPassword, newPassword } = req.body;
+    const user = await User.findById(req.user.id).select("+password");
+
+    const matches = await user.comparePassword(oldPassword);
+    if (!matches) {
+      throw new appError("Password is incorrect", 401);
+    }
+
+    user.password = newPassword;
+
+    await user.save();
+
+    const token = user.createToken();
+
+    res.status(200).json({
+      status: "success",
+      token: token,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export {
+  signup,
+  signin,
+  getAllUsers,
+  getById,
+  updateById,
+  deleteById,
+  updateUsreRole,
+  updateUserPassword,
+};

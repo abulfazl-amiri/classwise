@@ -29,6 +29,7 @@ const restrictTo = function (...roles) {
   };
 };
 
+// REUSE the logic in userController
 const setMeId = function (req, res, next) {
   req.params.id = req.user.id;
   next();

@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import validator from "validator";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 const userSchema = mongoose.Schema(
   {
@@ -43,15 +44,14 @@ userSchema.pre("save", async function () {
   }
 });
 
-// ! fix
-// userSchema.pre("findOneAndUpdate", async function () {
-//   if (this.isModified("password")) {
-//     this.password = await bcrypt.hash(this.password, 12);
-//   }
-// });
-
 userSchema.methods.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
+userSchema.methods.createToken = function () {
+  return jwt.sign({ id: this._id, role: this.role }, process.env.JWT_SECRET, {
+    algorithm: "HS256",
+    expiresIn: process.env.JWT_EXPIRES_IN,
+  });
+};
 export default mongoose.model("User", userSchema);
