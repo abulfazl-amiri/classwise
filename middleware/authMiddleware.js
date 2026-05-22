@@ -7,12 +7,15 @@ import User from "../models/User.js";
 const authenticate = async function (req, res, next) {
   try {
     if (!req.headers.authorization) {
-      next(new appError("No token is provided"));
+      throw new appError("No token is provided", 401);
     }
 
     const decoded = jwt.verify(req.headers.authorization.split(" ")[1], process.env.JWT_SECRET);
     console.log(decoded);
     const currentUser = await User.findById(decoded.id);
+    if (!currentUser) {
+      throw new appError("User not found", 401);
+    }
     req.user = currentUser;
     next();
   } catch (err) {

@@ -3,6 +3,9 @@ import validator from "validator";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
+import Resource from "./Resource.js";
+import Class from "./Class.js";
+
 const userSchema = mongoose.Schema(
   {
     email: {
@@ -24,7 +27,6 @@ const userSchema = mongoose.Schema(
     },
     password: {
       type: String,
-      trim: true,
       required: [true, "Password is required"],
       minLength: [8, "Passwords can not be less than 8 characters"],
       select: false,
@@ -38,12 +40,23 @@ const userSchema = mongoose.Schema(
   { timestamps: true },
 );
 
+// HOOKS
 userSchema.pre("save", async function () {
   if (this.isModified("password")) {
     this.password = await bcrypt.hash(this.password, 12);
   }
 });
 
+userSchema.pre("findOneAndDelete", async function () {
+  const owner = this.getFilter()?._id;
+  if (!owner) return;
+
+  await Resource.deleteMany({ owner: owner });
+
+  await Class.deleteMany({ owner: owner });
+});
+
+// INSTANCE METHODS
 userSchema.methods.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
@@ -54,4 +67,5 @@ userSchema.methods.createToken = function () {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 };
+
 export default mongoose.model("User", userSchema);

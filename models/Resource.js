@@ -49,11 +49,6 @@ const resourceSchema = mongoose.Schema(
   },
   {
     timestamps: true,
-    // adds/reveal/show document.id on docs
-    // id: false to remove it
-    id: false,
-    toJSON: { virtuals: true },
-    toObject: { virtuals: true },
   },
 );
 
