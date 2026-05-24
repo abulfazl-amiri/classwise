@@ -1,5 +1,6 @@
 import express from "express";
 import morgan from "morgan";
+import cookieParser from "cookie-parser";
 
 import classRoutes from "./routes/classRoutes.js";
 import resourceRoutes from "./routes/resourceRoutes.js";
@@ -9,9 +10,10 @@ import appError from "./utils/appError.js";
 
 const app = express();
 
-// middle wares
+// middlewares
 app.use(express.json());
 app.use(morgan("dev"));
+app.use(cookieParser());
 
 // configurations
 app.set("query parser", "extended");
@@ -41,6 +43,19 @@ app.use((err, req, res, next) => {
   if (err.name === "ValidationError") {
     err.statusCode = 422;
   }
+
+  if (err.name === "TokenExpiredError") {
+    err.statusCode = 401;
+    err.status = "fail";
+    err.message = "Session expired, please log in again";
+  }
+
+  if (err.name === "JsonWebTokenError") {
+    err.statusCode = 401;
+    err.status = "fail";
+    err.message = "Invalid token, please log in again";
+  }
+
   err.statuCode = err.statusCode || 500;
   err.status = err.status || "error";
 

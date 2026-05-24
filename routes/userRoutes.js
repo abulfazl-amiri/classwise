@@ -1,6 +1,7 @@
 import { Router } from "express";
 
 import {
+  refreshToken,
   signup,
   signin,
   getAllUsers,
@@ -13,6 +14,8 @@ import {
 import { authenticate, restrictTo, setMeId } from "../middleware/authMiddleware.js";
 
 const router = Router();
+
+router.route("/refresh").post(refreshToken);
 
 router.route("/signup").post(signup);
 router.route("/signin").post(signin);

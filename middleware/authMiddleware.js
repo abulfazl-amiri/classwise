@@ -11,7 +11,6 @@ const authenticate = async function (req, res, next) {
     }
 
     const decoded = jwt.verify(req.headers.authorization.split(" ")[1], process.env.JWT_SECRET);
-    console.log(decoded);
     const currentUser = await User.findById(decoded.id);
     if (!currentUser) {
       throw new appError("User not found", 401);
@@ -19,7 +18,7 @@ const authenticate = async function (req, res, next) {
     req.user = currentUser;
     next();
   } catch (err) {
-    next(new appError(err.message, 401));
+    next(err);
   }
 };
 

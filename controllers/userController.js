@@ -4,12 +4,67 @@ import jwt from "jsonwebtoken";
 
 import appError from "../utils/appError.js";
 import APIFeatures from "../utils/apiFeatures.js";
+import RefreshToken from "../models/RefreshToken.js";
 
+// Helpers
 const isProvided = function (...fields) {
   for (let field of fields) {
     if (!field) return false;
   }
   return true;
+};
+
+const generateRefreshToken = async function (userId, res) {
+  // sign the refreshToken
+  const token = jwt.sign({ id: userId }, process.env.JWT_REFRESH_SECRET, {
+    algorithm: "HS256",
+    expiresIn: process.env.JWT_REFRESH_EXPIRES_IN,
+  });
+
+  // save to DB
+  await RefreshToken.create({ token: token, user: userId });
+
+  // add it to cookie
+  res.cookie("refreshToken", token, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "strict",
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7days in milliseconds
+  });
+};
+
+// handlers
+
+const refreshToken = async function (req, res, next) {
+  try {
+    const refreshToken = req.cookies.refreshToken;
+
+    if (!refreshToken) throw new appError("Refresh Token is missing", 401);
+
+    jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+
+    const token = await RefreshToken.findOne({
+      token: refreshToken,
+      used: false,
+    });
+    if (!token) throw new appError("Invalid refresh token.", 401);
+
+    const user = await User.findById(token.user);
+    if (!user) throw new appError("User not found", 404);
+
+    await generateRefreshToken(user.id, res);
+    const accessToken = user.createToken();
+
+    token.used = true;
+    await token.save();
+
+    res.status(200).json({
+      status: "success",
+      token: accessToken,
+    });
+  } catch (err) {
+    next(err);
+  }
 };
 
 const signup = async function (req, res, next) {
@@ -30,9 +85,6 @@ const signup = async function (req, res, next) {
       throw new appError("Email is already in use", 409);
     }
 
-    // hashin the passwords done in the Model
-    // const hashedPassword = await bcrypt.hash(password, 12);
-
     const user = await User.create({
       username: username,
       email: email,
@@ -41,11 +93,12 @@ const signup = async function (req, res, next) {
     });
 
     // create the token
-    const token = user.createToken();
+    const accessToken = user.createToken();
+    const refreshToken = await generateRefreshToken(user._id, res);
 
     res.status(200).json({
       status: "success",
-      token: token,
+      token: accessToken,
     });
   } catch (err) {
     next(err);
@@ -73,12 +126,12 @@ const signin = async function (req, res, next) {
       throw new appError("Email or password was incorrect", 401);
     }
 
-    // create token
-    const token = foundUser.createToken();
+    const accessToken = foundUser.createToken();
+    const refreshToken = await generateRefreshToken(foundUser._id, res);
 
     res.status(200).json({
       status: "success",
-      token: token,
+      token: accessToken,
     });
   } catch (err) {
     next(err);
@@ -220,6 +273,7 @@ const updateUserPassword = async function (req, res, next) {
 };
 
 export {
+  refreshToken,
   signup,
   signin,
   getAllUsers,
