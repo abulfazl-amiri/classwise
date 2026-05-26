@@ -10,12 +10,17 @@ import {
   deleteById,
   updateUsreRole,
   updateUserPassword,
+  forgotPassword,
+  resetPassword,
 } from "../controllers/userController.js";
 import { authenticate, restrictTo, setMeId } from "../middleware/authMiddleware.js";
 
 const router = Router();
 
 router.route("/refresh").post(refreshToken);
+
+router.route("/forgot-password").post(forgotPassword);
+router.route("/reset-password/:resetToken").post(resetPassword);
 
 router.route("/signup").post(signup);
 router.route("/signin").post(signin);

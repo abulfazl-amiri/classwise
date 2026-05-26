@@ -1,10 +1,14 @@
-import User from "../models/User.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import crypto from "node:crypto";
+
+import User from "../models/User.js";
+import RefreshToken from "../models/RefreshToken.js";
+import ResetToken from "../models/ResetToken.js";
 
 import appError from "../utils/appError.js";
 import APIFeatures from "../utils/apiFeatures.js";
-import RefreshToken from "../models/RefreshToken.js";
+import sendEmail from "../utils/email.js";
 
 // Helpers
 const isProvided = function (...fields) {
@@ -272,6 +276,78 @@ const updateUserPassword = async function (req, res, next) {
   }
 };
 
+const forgotPassword = async function (req, res, next) {
+  try {
+    // same response for both case to avoid existing or not leakage
+    const respond = function () {
+      res.status(200).json({
+        status: "success",
+        message: "Check your inbox for a reset link",
+      });
+    };
+
+    const { email } = req.body;
+    const user = await User.findOne({ email: email });
+    if (!user) return respond();
+
+    // token
+    const token = crypto.randomBytes(32).toString("hex");
+
+    await ResetToken.create({
+      token: token,
+      user: user.id,
+      expiresAt: Date.now() + 15 * 60 * 1000, // 15 min later
+    });
+
+    await sendEmail({
+      to: user.email,
+      subject: "Reset password",
+      message:
+        "Your password reset link for classwise is:" +
+        `\n${process.env.CLIENT_URL}/reset-password/${token}\n` +
+        "Please don't share it with anyone",
+    });
+
+    respond();
+  } catch (err) {
+    next(err);
+  }
+};
+
+const resetPassword = async function (req, res, next) {
+  try {
+    const { resetToken } = req.params;
+    const { newPassword } = req.body;
+    if (!resetToken) throw new appError("Reset token is missing", 422);
+    if (!newPassword) throw new appError("newPassword is missing", 422);
+
+    const token = await ResetToken.findOne({
+      token: resetToken,
+      used: false,
+      expiresAt: { $gt: Date.now() },
+    });
+    if (!token) throw new appError("Invalid token", 401);
+
+    const user = await User.findById(token.user);
+    if (!user) throw new appError("User not found", 404);
+    user.password = newPassword;
+    await user.save();
+
+    token.used = true;
+    await token.save();
+
+    await generateRefreshToken(user.id, res);
+    const accessToken = user.createToken();
+
+    res.status(200).json({
+      status: "success",
+      token: accessToken,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 export {
   refreshToken,
   signup,
@@ -282,4 +358,6 @@ export {
   deleteById,
   updateUsreRole,
   updateUserPassword,
+  forgotPassword,
+  resetPassword,
 };
