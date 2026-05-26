@@ -22,13 +22,15 @@ app.use("/api/v1/classes", classRoutes);
 app.use("/api/v1/resources", resourceRoutes);
 app.use("/api/v1/auth", userRoutes);
 
+app.get("/", function (req, res) {
+  res.status(200).json({
+    status: "success",
+    message: "Welcome to Classwise",
+  });
+});
+
 // invalid routes
 app.use((req, res, next) => {
-  // res.status(404).json({
-  //   status: "error",
-  //   message: `Could not find endpoint '${req.originalUrl}' on the available endpoints`,
-  // });
-
   const err = new appError(
     `Could not find endpoint '${req.originalUrl}' on the available endpoints`,
   );
