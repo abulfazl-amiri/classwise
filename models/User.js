@@ -5,6 +5,8 @@ import jwt from "jsonwebtoken";
 
 import Resource from "./Resource.js";
 import Class from "./Class.js";
+import ResetToken from "./ResetToken.js";
+import RefreshToken from "./RefreshToken.js";
 
 const userSchema = mongoose.Schema(
   {
@@ -48,12 +50,16 @@ userSchema.pre("save", async function () {
 });
 
 userSchema.pre("findOneAndDelete", async function () {
-  const owner = this.getFilter()?._id;
-  if (!owner) return;
+  const user = this.getFilter()?._id;
+  if (!user) return;
 
-  await Resource.deleteMany({ owner: owner });
+  await Resource.deleteMany({ user: user });
 
-  await Class.deleteMany({ owner: owner });
+  await Class.deleteMany({ user: user });
+
+  await ResetToken.deleteMany({ user: user });
+
+  await RefreshToken.deleteMany({ user: user });
 });
 
 // INSTANCE METHODS

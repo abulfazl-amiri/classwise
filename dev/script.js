@@ -5,6 +5,8 @@ import express from "express";
 import Class from "../models/Class.js";
 import Resource from "../models/Resource.js";
 import User from "../models/User.js";
+import RefreshToken from "../models/RefreshToken.js";
+import ResetToken from "../models/ResetToken.js";
 
 try {
   await mongoose.connect(process.env.MONGO_URI);
@@ -38,22 +40,50 @@ const deleteAllUsers = async function () {
     await User.deleteMany({}); // {}: match all documents in the collection
     console.log("All the users deleted successfully");
   } catch (err) {
-    console.err(err);
+    console.error(err);
   }
 };
 
-if (process.argv[2] === "--delete" && process.argv[3] === "--classes") {
-  await deleteAllClasses();
-  process.exit();
-} else if (process.argv[2] === "--delete" && process.argv[3] === "--resources") {
-  await deleteAllResources();
-  process.exit();
-} else if (process.argv[2] === "--delete" && process.argv[3] === "--users") {
-  await deleteAllUsers();
-  process.exit();
-} else {
-  console.log(
-    "Please specify --delete with --resource | --classes | --users to delete all of them from db",
-  );
-  process.exit();
+const deleteAllRefreshTokens = async function () {
+  try {
+    await RefreshToken.deleteMany({});
+    console.log("all refresh tokens deleted successfully");
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const deleteAllResetTokens = async function () {
+  try {
+    await ResetToken.deleteMany({});
+    console.log("all reset tokens deleted successfully");
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+if (process.argv[2] === "--delete") {
+  switch (process.argv[3]) {
+    case "--users":
+      await deleteAllUsers();
+      break;
+    case "--resettokens":
+      await deleteAllResetTokens();
+      break;
+    case "--refreshtokens":
+      await deleteAllRefreshTokens();
+      break;
+    case "--classes":
+      await deleteAllClasses();
+      break;
+    case "--resources":
+      await deleteAllResources();
+      break;
+    default:
+      console.log(
+        "Invalid option. use --users | --resettokens | --refreshtokens | --classes | --resources",
+      );
+  }
+  process.exit(0);
 }
+process.exit(1);

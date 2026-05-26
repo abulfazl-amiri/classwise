@@ -12,11 +12,11 @@ const createClass = async (req, res, next) => {
     if (Array.isArray(req.body)) {
       clss = req.body.map((cls) => {
         const { _id, __v, ...rest } = cls;
-        return rest;
+        return { ...rest, user: req.user.id };
       });
     } else {
       const { _id, __v, ...rest } = req.body;
-      clss = rest;
+      clss = { ...rest, user: req.user.id };
     }
 
     const createdClasses = await Class.create(clss);
@@ -38,7 +38,7 @@ const getAllClasses = async (req, res, next) => {
       ? { ...req.query, ...res.locals.queryOverrides }
       : req.query;
 
-    const features = new APIFeatures(Class.find({ owner: req.user.id }), queryString)
+    const features = new APIFeatures(Class.find({ user: req.user.id }), queryString)
       .filter()
       .sort()
       .select()
@@ -60,7 +60,7 @@ const getAllClasses = async (req, res, next) => {
 
 const getById = async (req, res, next) => {
   try {
-    const foundClass = await Class.findOne({ _id: req.params.id, owner: req.user.id });
+    const foundClass = await Class.findOne({ _id: req.params.id, user: req.user.id });
     if (!foundClass) {
       throw new appError("Class not found", 404);
     }
@@ -77,9 +77,10 @@ const getById = async (req, res, next) => {
 
 const updateById = async (req, res, next) => {
   try {
+    const { _id, __v, user, ...safeBody } = req.body;
     const updatedClass = await Class.findOneAndUpdate(
-      { _id: req.params.id, owner: req.user.id },
-      req.body,
+      { _id: req.params.id, user: req.user.id },
+      safeBody,
       {
         returnDocument: "after",
         runValidators: true,
@@ -102,7 +103,7 @@ const updateById = async (req, res, next) => {
 
 const deleteById = async (req, res, next) => {
   try {
-    const deletedClass = await Class.findOneAndDelete({ _id: req.params.id, owner: req.user.id });
+    const deletedClass = await Class.findOneAndDelete({ _id: req.params.id, user: req.user.id });
     if (!deletedClass) {
       res.status(404).json({
         status: "error",

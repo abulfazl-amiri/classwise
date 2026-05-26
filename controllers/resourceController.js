@@ -17,12 +17,12 @@ const createResource = async (req, res, next) => {
     if (Array.isArray(req.body)) {
       resources = req.body.map((resource) => {
         const { _id, __v, ...rest } = resource;
-        return rest;
+        return { ...rest, user: req.user.id };
       });
     } else {
       console.log(req.body);
       const { _id, __v, ...rest } = req.body;
-      resources = rest;
+      resources = { ...rest, user: req.user.id };
     }
 
     const createdResources = await Resource.create(resources);
@@ -44,7 +44,7 @@ const getAllResource = async (req, res, next) => {
       ? { ...req.query, ...res.locals.queryOverrides }
       : req.query;
 
-    const features = new APIFeatures(Resource.find({ owner: req.user.id }), queryString)
+    const features = new APIFeatures(Resource.find({ user: req.user.id }), queryString)
       .filter()
       .sort()
       .select()
@@ -66,7 +66,7 @@ const getAllResource = async (req, res, next) => {
 
 const getById = async (req, res, next) => {
   try {
-    const foundResource = await Resource.findOne({ _id: req.params.id, owner: req.user.id });
+    const foundResource = await Resource.findOne({ _id: req.params.id, user: req.user.id });
     if (!foundResource) {
       throw new appError("Resource not found", 404);
     }
@@ -83,9 +83,10 @@ const getById = async (req, res, next) => {
 
 const updateById = async (req, res, next) => {
   try {
+    const { _id, __v, user, ...safeBody } = req.body;
     const updatedResource = await Resource.findOneAndUpdate(
-      { _id: req.params.id, owner: req.user.id },
-      req.body,
+      { _id: req.params.id, user: req.user.id },
+      safeBody,
       {
         returnDocument: "after",
         runValidators: true,
@@ -110,7 +111,7 @@ const deleteById = async (req, res, next) => {
   try {
     const deletedResource = await Resource.findOneAndDelete({
       _id: req.params.id,
-      owner: req.user.id,
+      user: req.user.id,
     });
 
     if (!deletedResource) {

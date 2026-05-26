@@ -6,7 +6,7 @@
     "totalUnits": 10,
     "level": "Beginner",
     "edition": 1,
-    "owner": "6a09cd0b6dc109998591d8a1"
+    "user": "6a09cd0b6dc109998591d8a1"
   },
   {
     "name": "First Friend 1",
@@ -15,7 +15,7 @@
     "totalUnits": 10,
     "level": "Beginner",
     "edition": 2,
-    "owner": "6a09cd0b6dc109998591d8a1"
+    "user": "6a09cd0b6dc109998591d8a1"
   },
   {
     "name": "First Friend 2",
@@ -24,7 +24,7 @@
     "totalUnits": 12,
     "level": "Beginner",
     "edition": 1,
-    "owner": "6a09cd0b6dc109998591d8a1"
+    "user": "6a09cd0b6dc109998591d8a1"
   },
   {
     "name": "First Friend 2",
@@ -33,7 +33,7 @@
     "totalUnits": 12,
     "level": "Beginner",
     "edition": 2,
-    "owner": "6a09cd0b6dc109998591d8a1"
+    "user": "6a09cd0b6dc109998591d8a1"
   },
   {
     "name": "First Friend 3",
@@ -42,6 +42,6 @@
     "totalUnits": 13,
     "level": "Elementary",
     "edition": 1,
-    "owner": "6a09cd0b6dc109998591d8a1"
+    "user": "6a09cd0b6dc109998591d8a1"
   }
 ]

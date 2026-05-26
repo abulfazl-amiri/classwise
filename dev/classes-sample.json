@@ -1,6 +1,6 @@
 [
   {
-    "owner": "6a09cd0b6dc109998591d8a1",
+    "user": "6a09cd0b6dc109998591d8a1",
     "name": "Beginner English A",
     "subject": "English",
     "startTime": "08:00",
@@ -13,7 +13,7 @@
     "students": 12
   },
   {
-    "owner": "6a09cd0b6dc109998591d8a1",
+    "user": "6a09cd0b6dc109998591d8a1",
     "name": "Beginner English B",
     "subject": "English",
     "startTime": "09:15",
@@ -26,7 +26,7 @@
     "students": 10
   },
   {
-    "owner": "6a09cd0b6dc109998591d8a1",
+    "user": "6a09cd0b6dc109998591d8a1",
     "name": "Intermediate English A",
     "subject": "English",
     "startTime": "10:30",
@@ -39,7 +39,7 @@
     "students": 15
   },
   {
-    "owner": "6a09cd0b6dc109998591d8a1",
+    "user": "6a09cd0b6dc109998591d8a1",
     "name": "Intermediate English B",
     "subject": "English",
     "startTime": "14:00",
@@ -52,7 +52,7 @@
     "students": 13
   },
   {
-    "owner": "6a09cd0b6dc109998591d8a1",
+    "user": "6a09cd0b6dc109998591d8a1",
     "name": "Advanced English A",
     "subject": "English",
     "startTime": "11:00",
@@ -65,7 +65,7 @@
     "students": 9
   },
   {
-    "owner": "6a09cd0b6dc109998591d8a1",
+    "user": "6a09cd0b6dc109998591d8a1",
     "name": "Advanced English B",
     "subject": "English",
     "startTime": "15:30",
