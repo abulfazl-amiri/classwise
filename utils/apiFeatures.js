@@ -10,6 +10,7 @@ class APIFeatures {
   filter() {
     // taking out and throw away: page, limit, fields, sort (we do not use them here)
     let { page, limit, fields, sort, ...queryObj } = this.queryString;
+    let operators = ["lt", "lte", "gte", "gt"];
 
     // Convert comparison operators to MongoDB syntax: e.g. { gte: '100' } -> { $gte: '100' }
     for (let [key, val] of Object.entries(queryObj)) {
@@ -17,6 +18,7 @@ class APIFeatures {
 
       queryObj[key] = Object.entries(val).reduce((acc, entry) => {
         const [k, v] = entry;
+        if (!operators.includes(k)) return acc;
         if (v === undefined) return acc;
         acc[`$${k}`] = v;
         return acc;

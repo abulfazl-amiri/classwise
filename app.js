@@ -58,10 +58,10 @@ app.use((err, req, res, next) => {
     err.message = "Invalid token, please log in again";
   }
 
-  err.statuCode = err.statusCode || 500;
+  err.statusCode = err.statusCode || 500;
   err.status = err.status || "error";
 
-  res.status(err.statuCode).json({
+  res.status(err.statusCode).json({
     status: err.status,
     message: err.message,
   });

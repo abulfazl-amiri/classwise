@@ -42,7 +42,7 @@ const userSchema = mongoose.Schema(
   { timestamps: true },
 );
 
-// HOOKS
+// Hooks
 userSchema.pre("save", async function () {
   if (this.isModified("password")) {
     this.password = await bcrypt.hash(this.password, 12);
@@ -62,9 +62,9 @@ userSchema.pre("findOneAndDelete", async function () {
   await RefreshToken.deleteMany({ user: user });
 });
 
-// INSTANCE METHODS
+// Instance methods
 userSchema.methods.comparePassword = async function (candidatePassword) {
-  return await bcrypt.compare(candidatePassword, this.password);
+  return bcrypt.compare(candidatePassword, this.password);
 };
 
 userSchema.methods.createToken = function () {
@@ -72,6 +72,19 @@ userSchema.methods.createToken = function () {
     algorithm: "HS256",
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
+};
+
+// static methods
+userSchema.statics.findByEmail = async function (email) {
+  return this.findOne({ email: email });
+};
+
+userSchema.statics.findByUsername = async function (username) {
+  return this.findOne({ username: username });
+};
+
+userSchema.statics.findByRole = async function (role) {
+  return this.find({ role: role });
 };
 
 export default mongoose.model("User", userSchema);

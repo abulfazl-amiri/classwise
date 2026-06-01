@@ -77,12 +77,12 @@ npm run start
 ### Auth
 
 ```http
-POST    /api/v1/users/signup
-POST    /api/v1/users/signin
+POST    /api/v1/auth/signup
+POST    /api/v1/auth/signin
 
-GET     /api/v1/users/me
-PATCH   /api/v1/users/me
-DELETE  /api/v1/users/me
+GET     /api/v1/auth/me
+PATCH   /api/v1/auth/me
+DELETE  /api/v1/auth/me
 ```
 
 ### Classes

@@ -229,9 +229,10 @@ const deleteById = async function (req, res, next) {
   }
 };
 
-const updateUsreRole = async function (req, res, next) {
+const updateUserRole = async function (req, res, next) {
   try {
     const { role } = req.body;
+    if (!role) throw new appError("role is missing", 404);
     const updatedUser = await User.findOneAndUpdate(
       { _id: req.params.id },
       { role: role },
@@ -240,6 +241,7 @@ const updateUsreRole = async function (req, res, next) {
         runValidators: true,
       },
     );
+    if (!updatedUser) throw new appError("User not found", 404);
     res.status(200).json({
       status: "success",
       data: {
@@ -255,6 +257,7 @@ const updateUserPassword = async function (req, res, next) {
   try {
     const { oldPassword, newPassword } = req.body;
     const user = await User.findById(req.user.id).select("+password");
+    if (!user) throw new appError("User not found, please login again", 401);
 
     const matches = await user.comparePassword(oldPassword);
     if (!matches) {
@@ -356,7 +359,7 @@ export {
   getById,
   updateById,
   deleteById,
-  updateUsreRole,
+  updateUserRole,
   updateUserPassword,
   forgotPassword,
   resetPassword,

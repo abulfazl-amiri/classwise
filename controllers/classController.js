@@ -22,7 +22,7 @@ const createClass = async (req, res, next) => {
     const createdClasses = await Class.create(clss);
     res.status(201).json({
       status: "success",
-      results: createdClasses.length,
+      results: createdClasses?.length,
       data: {
         classes: createdClasses,
       },

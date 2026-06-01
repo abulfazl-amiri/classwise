@@ -6,8 +6,8 @@ import User from "../models/User.js";
 
 const authenticate = async function (req, res, next) {
   try {
-    if (!req.headers.authorization) {
-      throw new appError("No token is provided", 401);
+    if (!req.headers.authorization || !req.headers.authorization.split(" ")[1]) {
+      throw new appError("No token or malformat token is provided", 401);
     }
 
     const decoded = jwt.verify(req.headers.authorization.split(" ")[1], process.env.JWT_SECRET);

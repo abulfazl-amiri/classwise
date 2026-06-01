@@ -14,7 +14,7 @@ import { authenticate } from "../middleware/authMiddleware.js";
 const router = Router();
 
 router.route("/recent").get(authenticate, aliasRecent, getAllResource);
-router.route("/level-beginner").get(authenticate, findResourcesByLevel, getAllResource);
+router.route("/level").get(authenticate, findResourcesByLevel);
 
 router.route("/").post(authenticate, createResource).get(authenticate, getAllResource);
 router

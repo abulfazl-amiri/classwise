@@ -44,7 +44,6 @@ const resourceSchema = mongoose.Schema(
     },
     edition: {
       type: Number,
-      trim: true,
     },
   },
   {

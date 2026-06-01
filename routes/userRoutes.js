@@ -8,7 +8,7 @@ import {
   getById,
   updateById,
   deleteById,
-  updateUsreRole,
+  updateUserRole,
   updateUserPassword,
   forgotPassword,
   resetPassword,
@@ -31,7 +31,7 @@ router
   .get(authenticate, restrictTo("admin"), getById)
   .patch(authenticate, restrictTo("admin"), updateById)
   .delete(authenticate, restrictTo("admin"), deleteById);
-router.route("/users/:id/role").patch(authenticate, restrictTo("admin"), updateUsreRole);
+router.route("/users/:id/role").patch(authenticate, restrictTo("admin"), updateUserRole);
 
 router
   .route("/me")

@@ -20,7 +20,6 @@ const createResource = async (req, res, next) => {
         return { ...rest, user: req.user.id };
       });
     } else {
-      console.log(req.body);
       const { _id, __v, ...rest } = req.body;
       resources = { ...rest, user: req.user.id };
     }
@@ -28,7 +27,7 @@ const createResource = async (req, res, next) => {
     const createdResources = await Resource.create(resources);
     res.status(201).json({
       status: "success",
-      results: createdResources.length,
+      results: createdResources?.length,
       data: {
         resources: createdResources,
       },
@@ -132,7 +131,20 @@ const deleteById = async (req, res, next) => {
 const findResourcesByLevel = async function (req, res, next) {
   try {
     const data = await Resource.aggregate([
-      { $match: { level: { $in: ["Beginner"] } } },
+      {
+        $match: {
+          level: {
+            $in: [
+              "beginner",
+              "pre-intermediate",
+              "intermediate",
+              "upper-intermediate",
+              "advanced",
+              "general",
+            ],
+          },
+        },
+      },
       {
         $group: {
           _id: "$level",
