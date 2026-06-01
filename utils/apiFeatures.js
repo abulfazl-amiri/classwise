@@ -1,3 +1,14 @@
+/**
+ * Adds common API query behavior to a Mongoose query.
+ *
+ * Supported query params:
+ * - filtering: any model field, plus comparison operators lt/lte/gt/gte
+ * - sort: comma-separated fields, e.g. sort=-createdAt,name
+ * - fields: comma-separated selected fields, e.g. fields=name,level
+ * - page/limit: pagination controls
+ *
+ * Methods are chainable and mutate `this.query`.
+ */
 class APIFeatures {
   /**
    * @param {mongoose.Query} query - Mongoose query object e.g. Resource.find()

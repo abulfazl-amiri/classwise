@@ -1,5 +1,11 @@
 import nodemailer from "nodemailer";
 
+/**
+ * Sends a plain-text email through Gmail SMTP.
+ *
+ * Requires EMAIL_USER and EMAIL_PASSWORD in the environment.
+ * Accepts `{ to, subject, message }` and returns Nodemailer's send result.
+ */
 const sendEmail = async function ({ to, subject, message }) {
   const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
