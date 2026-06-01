@@ -20,11 +20,12 @@ const createClass = async (req, res, next) => {
     }
 
     const createdClasses = await Class.create(clss);
+    const classesArray = Array.isArray(createdClasses) ? createdClasses : [createdClasses];
     res.status(201).json({
       status: "success",
-      results: createdClasses?.length,
+      results: classesArray.length,
       data: {
-        classes: createdClasses,
+        classes: classesArray,
       },
     });
   } catch (err) {
@@ -105,11 +106,7 @@ const deleteById = async (req, res, next) => {
   try {
     const deletedClass = await Class.findOneAndDelete({ _id: req.params.id, user: req.user.id });
     if (!deletedClass) {
-      res.status(404).json({
-        status: "error",
-        message: "Class not found",
-      });
-      return;
+      throw new appError("Class not found", 404)
     }
     res.status(204).json({
       status: "success",

@@ -25,11 +25,12 @@ const createResource = async (req, res, next) => {
     }
 
     const createdResources = await Resource.create(resources);
+    const resourcesArray = Array.isArray(createdResources) ? createdResources : [createdResources]
     res.status(201).json({
       status: "success",
-      results: createdResources?.length,
+      results: resourcesArray.length,
       data: {
-        resources: createdResources,
+        resources: resourcesArray,
       },
     });
   } catch (err) {

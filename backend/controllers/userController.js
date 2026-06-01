@@ -232,7 +232,7 @@ const deleteById = async function (req, res, next) {
 const updateUserRole = async function (req, res, next) {
   try {
     const { role } = req.body;
-    if (!role) throw new appError("role is missing", 404);
+    if (!role) throw new appError("role is missing", 422);
     const updatedUser = await User.findOneAndUpdate(
       { _id: req.params.id },
       { role: role },
