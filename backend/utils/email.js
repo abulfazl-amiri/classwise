@@ -1,30 +1,21 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 /**
- * Sends a plain-text email through Gmail SMTP.
+ * Sends a plain-text email through Resend.
  *
- * Requires EMAIL_USER and EMAIL_PASSWORD in the environment.
- * Accepts `{ to, subject, message }` and returns Nodemailer's send result.
+ * Requires RESEND_API_KEY in the environment.
+ * Accepts `{ to, subject, message }` and returns Resend's send result.
  */
 const sendEmail = async function ({ to, subject, message }) {
-  const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASSWORD,
-    },
-  });
-
-  const mailOptions = {
-    from: `"Classwise" <${process.env.EMAIL_USER}>`,
+  return await resend.emails.send({
+    from: "Classwise <onboarding@resend.dev>",
     to: to,
     subject: subject,
     text: message,
-  };
-
-  return await transporter.sendMail(mailOptions);
+    html: `<p>${message}</p>`,
+  });
 };
 
 export default sendEmail;
