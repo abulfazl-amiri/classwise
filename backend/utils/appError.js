@@ -12,6 +12,8 @@ class appError extends Error {
 
     this.statusCode = code;
     this.status = `${this.statusCode}`.startsWith(4) ? "fail" : "error";
+    // all errors thrown manully by us get this field
+    this.isOperational = true;
   }
 }
 export default appError;
