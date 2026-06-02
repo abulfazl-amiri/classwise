@@ -47,7 +47,7 @@ const deleteAllUsers = async function () {
 const deleteAllRefreshTokens = async function () {
   try {
     await RefreshToken.deleteMany({});
-    console.log("all refresh tokens deleted successfully");
+    console.log("All refresh tokens deleted successfully");
   } catch (err) {
     console.error(err);
   }
@@ -56,7 +56,7 @@ const deleteAllRefreshTokens = async function () {
 const deleteAllResetTokens = async function () {
   try {
     await ResetToken.deleteMany({});
-    console.log("all reset tokens deleted successfully");
+    console.log("All reset tokens deleted successfully");
   } catch (err) {
     console.error(err);
   }
