@@ -32,8 +32,8 @@ backend/
 │   ├── user.model.js
 │   ├── class.model.js
 │   ├── resource.model.js
-│   ├── RefreshToken.js
-│   └── ResetToken.js
+│   ├── reset-token.model.js
+│   └── reset-token.model.js
 ├── controllers/
 │   ├── user.controller.js
 │   ├── class.controller.js

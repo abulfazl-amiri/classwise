@@ -3,8 +3,8 @@ import jwt from "jsonwebtoken";
 import crypto from "node:crypto";
 
 import User from "../models/user.model.js";
-import RefreshToken from "../models/RefreshToken.js";
-import ResetToken from "../models/ResetToken.js";
+import RefreshToken from "../models/reset-token.model.js";
+import ResetToken from "../models/reset-token.model.js";
 
 import appError from "../utils/error.util.js";
 import APIFeatures from "../utils/query.util.js";
