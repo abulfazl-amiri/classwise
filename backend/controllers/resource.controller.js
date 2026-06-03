@@ -1,7 +1,7 @@
-import Resource from "../models/Resource.js";
-import APIFeatures from "./../utils/apiFeatures.js";
+import Resource from "../models/resource.model.js";
+import APIFeatures from "../utils/query.util.js";
 
-import appError from "./../utils/appError.js";
+import appError from "../utils/error.util.js";
 
 // ALIASES
 const aliasRecent = function (req, res, next) {
@@ -25,7 +25,7 @@ const createResource = async (req, res, next) => {
     }
 
     const createdResources = await Resource.create(resources);
-    const resourcesArray = Array.isArray(createdResources) ? createdResources : [createdResources]
+    const resourcesArray = Array.isArray(createdResources) ? createdResources : [createdResources];
     res.status(201).json({
       status: "success",
       results: resourcesArray.length,

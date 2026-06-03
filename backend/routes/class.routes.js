@@ -6,7 +6,7 @@ import {
   getById,
   updateById,
   deleteById,
-} from "../controllers/classController.js";
+} from "../controllers/class.controller.js";
 
 import { authenticate } from "../middleware/authMiddleware.js";
 const router = Router();

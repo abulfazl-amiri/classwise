@@ -2,11 +2,11 @@ import express from "express";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
 
-import classRoutes from "./routes/classRoutes.js";
-import resourceRoutes from "./routes/resourceRoutes.js";
-import userRoutes from "./routes/userRoutes.js";
+import classRoutes from "./routes/class.routes.js";
+import resourceRoutes from "./routes/resource.routes.js";
+import userRoutes from "./routes/user.routes.js";
 
-import appError from "./utils/appError.js";
+import appError from "./utils/error.util.js";
 
 const app = express();
 

@@ -12,7 +12,7 @@ import {
   updateUserPassword,
   forgotPassword,
   resetPassword,
-} from "../controllers/userController.js";
+} from "../controllers/user.controller.js";
 import { authenticate, restrictTo, setMeId } from "../middleware/authMiddleware.js";
 
 const router = Router();

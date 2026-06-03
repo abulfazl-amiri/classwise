@@ -1,8 +1,8 @@
 import jwt from "jsonwebtoken";
 import "dotenv/config.js";
 
-import appError from "../utils/appError.js";
-import User from "../models/User.js";
+import appError from "../utils/error.util.js";
+import User from "../models/user.model.js";
 
 const authenticate = async function (req, res, next) {
   try {

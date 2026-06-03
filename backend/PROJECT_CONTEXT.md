@@ -29,25 +29,25 @@ backend/
 ├── app.js
 ├── server.js
 ├── models/
-│   ├── User.js
-│   ├── Class.js
-│   ├── Resource.js
+│   ├── user.model.js
+│   ├── class.model.js
+│   ├── resource.model.js
 │   ├── RefreshToken.js
 │   └── ResetToken.js
 ├── controllers/
-│   ├── userController.js
-│   ├── classController.js
-│   └── resourceController.js
+│   ├── user.controller.js
+│   ├── class.controller.js
+│   └── resource.controller.js
 ├── routes/
-│   ├── userRoutes.js
-│   ├── classRoutes.js
-│   └── resourceRoutes.js
+│   ├── user.routes.js
+│   ├── class.routes.js
+│   └── resource.routes.js
 ├── middleware/
 │   └── authMiddleware.js
 ├── utils/
-│   ├── apiFeatures.js
-│   ├── appError.js
-│   └── email.js
+│   ├── query.util.js
+│   ├── error.util.js
+│   └── email.util.js
 └── dev/
     ├── classes-sample.json
     ├── resources-sample.json
@@ -122,10 +122,10 @@ Resource routes are mounted under `/api/v1/resources` and require auth:
 ## Verified During This Review
 
 - `node --check app.js` passed.
-- `node --check models/User.js` passed.
-- `node --check controllers/userController.js` passed.
-- `node --check controllers/classController.js` passed.
-- `node --check controllers/resourceController.js` passed.
+- `node --check models/user.model.js` passed.
+- `node --check controllers/user.controller.js` passed.
+- `node --check controllers/class.controller.js` passed.
+- `node --check controllers/resource.controller.js` passed.
 - `node --check middleware/authMiddleware.js` passed.
 - `node -e "import('./app.js')"` passed.
 
@@ -176,10 +176,10 @@ Keep the focus on hardening before adding new features:
 
 ```bash
 node --check app.js
-node --check models/User.js
-node --check controllers/userController.js
-node --check controllers/classController.js
-node --check controllers/resourceController.js
+node --check models/user.model.js
+node --check controllers/user.controller.js
+node --check controllers/class.controller.js
+node --check controllers/resource.controller.js
 node --check middleware/authMiddleware.js
 node -e "import('./app.js')"
 ```

@@ -8,7 +8,7 @@ import {
   updateById,
   deleteById,
   findResourcesByLevel,
-} from "../controllers/resourceController.js";
+} from "../controllers/resource.controller.js";
 import { authenticate } from "../middleware/authMiddleware.js";
 
 const router = Router();

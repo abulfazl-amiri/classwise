@@ -1,7 +1,7 @@
-import Class from "./../models/Class.js";
-import APIFeatures from "./../utils/apiFeatures.js";
+import Class from "../models/class.model.js";
+import APIFeatures from "../utils/query.util.js";
 
-import appError from "../utils/appError.js";
+import appError from "../utils/error.util.js";
 
 //// CRUD
 
@@ -106,7 +106,7 @@ const deleteById = async (req, res, next) => {
   try {
     const deletedClass = await Class.findOneAndDelete({ _id: req.params.id, user: req.user.id });
     if (!deletedClass) {
-      throw new appError("Class not found", 404)
+      throw new appError("Class not found", 404);
     }
     res.status(204).json({
       status: "success",
