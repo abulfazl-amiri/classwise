@@ -2,13 +2,13 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import crypto from "node:crypto";
 
-import User from "../models/user.model.js";
-import RefreshToken from "../models/reset-token.model.js";
-import ResetToken from "../models/reset-token.model.js";
+import User from "./user.model.js";
+import RefreshToken from "./reset-token.model.js";
+import ResetToken from "./reset-token.model.js";
 
-import appError from "../utils/error.util.js";
-import APIFeatures from "../utils/query.util.js";
-import sendEmail from "../utils/email.util.js";
+import appError from "../../utils/error.util.js";
+import APIFeatures from "../../utils/query.util.js";
+import sendEmail from "../../utils/email.util.js";
 
 // Helpers
 const isProvided = function (...fields) {

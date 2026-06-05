@@ -12,8 +12,8 @@ import {
   updateUserPassword,
   forgotPassword,
   resetPassword,
-} from "../controllers/user.controller.js";
-import { authenticate, restrictTo, setMeId } from "../middleware/authMiddleware.js";
+} from "./user.controller.js";
+import { authenticate, restrictTo, setMeId } from "../../middleware/authMiddleware.js";
 
 const router = Router();
 

@@ -29,8 +29,7 @@ class APIFeatures {
 
       queryObj[key] = Object.entries(val).reduce((acc, entry) => {
         const [k, v] = entry;
-        if (!operators.includes(k)) return acc;
-        if (v === undefined) return acc;
+        if (!operators.includes(k) || v === undefined) return acc;
         acc[`$${k}`] = v;
         return acc;
       }, {});

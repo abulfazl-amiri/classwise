@@ -1,7 +1,7 @@
-import Resource from "../models/resource.model.js";
-import APIFeatures from "../utils/query.util.js";
+import Resource from "./resource.model.js";
+import APIFeatures from "../../utils/query.util.js";
 
-import appError from "../utils/error.util.js";
+import appError from "../../utils/error.util.js";
 
 // ALIASES
 const aliasRecent = function (req, res, next) {

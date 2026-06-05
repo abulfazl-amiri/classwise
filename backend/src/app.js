@@ -2,9 +2,9 @@ import express from "express";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
 
-import classRoutes from "./routes/class.routes.js";
-import resourceRoutes from "./routes/resource.routes.js";
-import userRoutes from "./routes/user.routes.js";
+import classRoutes from "./features/classes/class.routes.js";
+import resourceRoutes from "./features/resources/resource.routes.js";
+import userRoutes from "./features/users/user.routes.js";
 
 import appError from "./utils/error.util.js";
 

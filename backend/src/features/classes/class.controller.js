@@ -1,7 +1,7 @@
-import Class from "../models/class.model.js";
-import APIFeatures from "../utils/query.util.js";
+import Class from "./class.model.js";
+import APIFeatures from "../../utils/query.util.js";
 
-import appError from "../utils/error.util.js";
+import appError from "../../utils/error.util.js";
 
 //// CRUD
 

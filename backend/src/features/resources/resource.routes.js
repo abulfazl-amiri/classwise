@@ -8,8 +8,8 @@ import {
   updateById,
   deleteById,
   findResourcesByLevel,
-} from "../controllers/resource.controller.js";
-import { authenticate } from "../middleware/authMiddleware.js";
+} from "./resource.controller.js";
+import { authenticate } from "../../middleware/authMiddleware.js";
 
 const router = Router();
 

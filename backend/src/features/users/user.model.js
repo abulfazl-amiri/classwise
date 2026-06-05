@@ -3,8 +3,8 @@ import validator from "validator";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-import Resource from "./resource.model.js";
-import Class from "./class.model.js";
+import Resource from "../resources/resource.model.js";
+import Class from "../classes/class.model.js";
 import ResetToken from "./reset-token.model.js";
 import RefreshToken from "./reset-token.model.js";
 
