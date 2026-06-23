@@ -18,6 +18,7 @@ class APIFeatures {
     this.query = query;
     this.queryString = queryString;
   }
+
   filter() {
     // taking out and throw away: page, limit, fields, sort (we do not use them here)
     let { page, limit, fields, sort, ...queryObj } = this.queryString;

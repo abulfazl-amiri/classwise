@@ -5,6 +5,7 @@ const resourceSchema = mongoose.Schema(
     user: {
       type: Schema.Types.ObjectId,
       ref: "User",
+      required: [true, "User is required"],
     },
     name: {
       type: String,
@@ -20,18 +21,19 @@ const resourceSchema = mongoose.Schema(
 
     totalPages: {
       type: Number,
-      required: [true, "Page is required"],
-      min: [0, "Total pages can not be less than 0"],
+      required: [true, "Total pages is required"],
+      min: [1, "Total pages must be an integer greater than 0"],
     },
 
     totalUnits: {
       type: Number,
       required: [true, "Total Chapters is required"],
-      min: [0, "Total units can not be less than 0"],
+      min: [1, "Total units must be an integer greater than 0"],
     },
     level: {
       type: String,
       lowercase: true,
+      required: [true, "Level is required"],
       enum: [
         "beginner",
         "pre-intermediate",
@@ -44,6 +46,7 @@ const resourceSchema = mongoose.Schema(
     },
     edition: {
       type: Number,
+      min: [0, "Edition can not be less than 0"],
     },
   },
   {

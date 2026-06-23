@@ -5,8 +5,10 @@ import cookieParser from "cookie-parser";
 import classRoutes from "./features/classes/class.routes.js";
 import resourceRoutes from "./features/resources/resource.routes.js";
 import userRoutes from "./features/users/user.routes.js";
+import authRoutes from "./features/auth/auth.routes.js";
+import sessionRoutes from "./features/sessions/session.routes.js";
 
-import appError from "./utils/error.util.js";
+import AppError from "./utils/error.util.js";
 
 const app = express();
 
@@ -17,10 +19,14 @@ app.use(cookieParser());
 
 // configurations
 app.set("query parser", "extended");
+app.set("trust proxy", true);
 
+// route mounting
 app.use("/api/v1/classes", classRoutes);
 app.use("/api/v1/resources", resourceRoutes);
-app.use("/api/v1/auth", userRoutes);
+app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/sessions", sessionRoutes);
 
 app.get("/", function (req, res) {
   res.status(200).json({
@@ -31,7 +37,7 @@ app.get("/", function (req, res) {
 
 // invalid routes
 app.use((req, res, next) => {
-  const err = new appError(
+  const err = new AppError(
     `Could not find endpoint '${req.originalUrl}' on the available endpoints`,
   );
   err.statusCode = 404;
@@ -45,7 +51,7 @@ app.use((err, req, res, next) => {
 
   if (env === "development") {
     console.error(err);
-  } else if (env === "production" && !(err instanceof appError)) {
+  } else if (env === "production" && !(err instanceof AppError)) {
     console.error(err);
   }
 

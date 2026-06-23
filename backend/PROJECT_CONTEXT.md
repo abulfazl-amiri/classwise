@@ -74,12 +74,12 @@ backend/
   pagination.
 - Resource alias route: `GET /api/v1/resources/recent`.
 - Resource aggregation route: `GET /api/v1/resources/level`.
-- Custom `appError` class and a global error handler in `app.js`.
+- Custom `AppError` class and a global error handler in `app.js`.
 - User-delete cleanup hook that removes that user's classes, resources, reset
   tokens, and refresh tokens.
 - Class/resource create responses now normalize single and bulk creates into an
   array and return a consistent `results` count.
-- Class/resource/user not-found paths mostly flow through the shared `appError`
+- Class/resource/user not-found paths mostly flow through the shared `AppError`
   pattern.
 
 ## Current API Surface
@@ -134,7 +134,7 @@ Resource routes are mounted under `/api/v1/resources` and require auth:
 1. `package.json` still has the placeholder test script, so there is no real
    automated test suite yet.
 2. The global error handler returns `err.message` for all errors. Trusted
-   `appError` messages are fine, but unknown/internal errors should return a
+   `AppError` messages are fine, but unknown/internal errors should return a
    generic client message and keep details in server logs.
 3. The global error handler logs the full error with `console.log(err)`.
    Replace this with intentional development/production logging before shipping.

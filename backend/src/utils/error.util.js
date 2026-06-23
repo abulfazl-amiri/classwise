@@ -6,7 +6,7 @@
  * - 4xx errors become "fail"
  * - 5xx errors become "error"
  */
-class appError extends Error {
+class AppError extends Error {
   constructor(message, code) {
     super(message);
 
@@ -16,4 +16,4 @@ class appError extends Error {
     this.isOperational = true;
   }
 }
-export default appError;
+export default AppError;

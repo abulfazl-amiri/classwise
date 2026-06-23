@@ -1,43 +1,34 @@
 import { Router } from "express";
 
-import {
-  refreshToken,
-  signup,
-  signin,
-  getAllUsers,
-  getById,
-  updateById,
-  deleteById,
-  updateUserRole,
-  updateUserPassword,
-  forgotPassword,
-  resetPassword,
-} from "./user.controller.js";
-import { authenticate, restrictTo, setMeId } from "../../middleware/authMiddleware.js";
+import * as userController from "./user.controller.js";
+import * as userValidator from "./user.validator.js";
+import { authenticate, requireRole, setMeId } from "../../middleware/auth.middleware.js";
 
 const router = Router();
 
-router.route("/refresh").post(refreshToken);
-
-router.route("/forgot-password").post(forgotPassword);
-router.route("/reset-password/:resetToken").post(resetPassword);
-
-router.route("/signup").post(signup);
-router.route("/signin").post(signin);
-
-router.route("/users").get(authenticate, restrictTo("admin"), getAllUsers);
-router
-  .route("/users/:id")
-  .get(authenticate, restrictTo("admin"), getById)
-  .patch(authenticate, restrictTo("admin"), updateById)
-  .delete(authenticate, restrictTo("admin"), deleteById);
-router.route("/users/:id/role").patch(authenticate, restrictTo("admin"), updateUserRole);
-
 router
   .route("/me")
-  .get(authenticate, setMeId, getById)
-  .patch(authenticate, setMeId, updateById)
-  .delete(authenticate, setMeId, deleteById);
-router.route("/me/change-password").patch(authenticate, updateUserPassword);
+  .get(authenticate, setMeId, userController.getById)
+  .patch(authenticate, setMeId, userController.updateById)
+  .delete(authenticate, setMeId, userController.deleteById);
+router
+  .route("/me/change-password")
+  .patch(authenticate, userValidator.changePassword, userController.changePassword);
+
+// only admin
+router.route("/").get(authenticate, requireRole("admin"), userController.getAllUsers);
+router
+  .route("/:id")
+  .get(authenticate, requireRole("admin"), userController.getById)
+  .patch(authenticate, requireRole("admin"), userController.updateById)
+  .delete(authenticate, requireRole("admin"), userController.deleteById);
+router
+  .route("/:id/role")
+  .patch(
+    authenticate,
+    requireRole("admin"),
+    userValidator.updateRole,
+    userController.updateUserRole,
+  );
 
 export default router;

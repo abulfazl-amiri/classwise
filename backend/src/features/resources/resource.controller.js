@@ -1,36 +1,20 @@
-import Resource from "./resource.model.js";
 import APIFeatures from "../../utils/query.util.js";
 
-import appError from "../../utils/error.util.js";
-
-// ALIASES
+import { sanitizeBody } from "../../utils/validation.util.js";
+import * as resourceService from "./resource.service.js";
+import * as resourceRepository from "./resource.repository.js";
 const aliasRecent = function (req, res, next) {
   res.locals.queryOverrides = { sort: "-createdAt", limit: 5 };
   next();
 };
 
-// CRUD
-const createResource = async (req, res, next) => {
+const create = async (req, res, next) => {
   try {
-    // filtering for _id and __v to not let client create their own ones
-    let resources;
-    if (Array.isArray(req.body)) {
-      resources = req.body.map((resource) => {
-        const { _id, __v, ...rest } = resource;
-        return { ...rest, user: req.user.id };
-      });
-    } else {
-      const { _id, __v, ...rest } = req.body;
-      resources = { ...rest, user: req.user.id };
-    }
-
-    const createdResources = await Resource.create(resources);
-    const resourcesArray = Array.isArray(createdResources) ? createdResources : [createdResources];
+    const createdResource = await resourceService.create(sanitizeBody(req));
     res.status(201).json({
       status: "success",
-      results: resourcesArray.length,
       data: {
-        resources: resourcesArray,
+        resource: createdResource,
       },
     });
   } catch (err) {
@@ -38,25 +22,28 @@ const createResource = async (req, res, next) => {
   }
 };
 
-const getAllResource = async (req, res, next) => {
+const getAll = async (req, res, next) => {
   try {
     let queryString = res.locals.queryOverrides
       ? { ...req.query, ...res.locals.queryOverrides }
       : req.query;
 
-    const features = new APIFeatures(Resource.find({ user: req.user.id }), queryString)
+    const features = new APIFeatures(
+      resourceRepository.buildQuery({ user: req.user._id }),
+      queryString,
+    )
       .filter()
       .sort()
       .select()
       .paginate();
 
-    const allResources = await features.query;
+    const resources = await features.query;
 
     res.status(200).json({
       status: "success",
-      results: allResources.length,
+      results: resources.length,
       data: {
-        resources: allResources,
+        resources: resources,
       },
     });
   } catch (err) {
@@ -64,12 +51,9 @@ const getAllResource = async (req, res, next) => {
   }
 };
 
-const getById = async (req, res, next) => {
+const getOne = async (req, res, next) => {
   try {
-    const foundResource = await Resource.findOne({ _id: req.params.id, user: req.user.id });
-    if (!foundResource) {
-      throw new appError("Resource not found", 404);
-    }
+    const foundResource = await resourceService.getOne({ _id: req.params.id, user: req.user._id });
     res.status(200).json({
       status: "success",
       data: {
@@ -81,21 +65,12 @@ const getById = async (req, res, next) => {
   }
 };
 
-const updateById = async (req, res, next) => {
+const updateOne = async (req, res, next) => {
   try {
-    const { _id, __v, user, ...safeBody } = req.body;
-    const updatedResource = await Resource.findOneAndUpdate(
+    const updatedResource = await resourceService.updateOne(
       { _id: req.params.id, user: req.user.id },
-      safeBody,
-      {
-        returnDocument: "after",
-        runValidators: true,
-      },
+      sanitizeBody(req),
     );
-
-    if (!updatedResource) {
-      throw new appError("Resource not found", 404);
-    }
     res.status(200).json({
       status: "success",
       data: {
@@ -107,80 +82,17 @@ const updateById = async (req, res, next) => {
   }
 };
 
-const deleteById = async (req, res, next) => {
+const deleteOne = async (req, res, next) => {
   try {
-    const deletedResource = await Resource.findOneAndDelete({
+    await resourceService.deleteOne({
       _id: req.params.id,
-      user: req.user.id,
+      user: req.user._id,
     });
 
-    if (!deletedResource) {
-      throw new appError("Resource not found", 404);
-    }
-    res.status(204).json({
-      status: "success",
-      data: {
-        resources: null,
-      },
-    });
+    res.status(204).end();
   } catch (err) {
     next(err);
   }
 };
 
-// AGGREGATIONS
-const findResourcesByLevel = async function (req, res, next) {
-  try {
-    const data = await Resource.aggregate([
-      {
-        $match: {
-          level: {
-            $in: [
-              "beginner",
-              "pre-intermediate",
-              "intermediate",
-              "upper-intermediate",
-              "advanced",
-              "general",
-            ],
-          },
-        },
-      },
-      {
-        $group: {
-          _id: "$level",
-          about: { $push: { name: "$name", author: "$author" } },
-          numOfResources: {
-            $sum: 1,
-          },
-        },
-      },
-      {
-        $project: {
-          level: "$_id",
-          quantity: "$numOfResources",
-          resource: "$about",
-          _id: 0,
-        },
-      },
-    ]);
-    res.status(200).json({
-      status: "success",
-      data: {
-        data: data,
-      },
-    });
-  } catch (err) {
-    next(err);
-  }
-};
-
-export {
-  aliasRecent,
-  createResource,
-  getAllResource,
-  getById,
-  updateById,
-  deleteById,
-  findResourcesByLevel,
-};
+export { aliasRecent, create, getAll, getOne, updateOne, deleteOne };

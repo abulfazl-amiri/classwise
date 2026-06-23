@@ -5,6 +5,7 @@ const classSchema = new mongoose.Schema(
     user: {
       type: Schema.Types.ObjectId,
       ref: "User",
+      required: [true, "User is required"],
     },
     name: {
       type: Schema.Types.String,
@@ -22,6 +23,7 @@ const classSchema = new mongoose.Schema(
         resource: {
           type: Schema.Types.ObjectId,
           ref: "Resource",
+          required: [true, "Resource is required"],
         },
 
         currentPage: {
@@ -39,23 +41,27 @@ const classSchema = new mongoose.Schema(
     ],
 
     startTime: {
-      type: Schema.Types.String,
-      trim: true,
+      type: Number,
+      min: [0, "Start time cannot be less than 0 (00:00)"],
+      max: [1439, "Start time cannot exceed 1439 (23:59)"],
     },
     endTime: {
-      type: Schema.Types.String,
-      trim: true,
+      type: Number,
+      min: [0, "End time cannot be less than 0 (00:00)"],
+      max: [1439, "End time cannot exceed 1439 (23:59)"],
     },
-
-    lastSession: {
+    lastLesson: {
       date: {
         type: Schema.Types.Date,
+        required: [true, "Date is required for last lesson"],
       },
       note: {
         type: String,
+        trim: true,
       },
       plan: {
         type: String,
+        trim: true,
       },
     },
 

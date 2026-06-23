@@ -1,26 +1,18 @@
-import Class from "./class.model.js";
 import APIFeatures from "../../utils/query.util.js";
 
-import appError from "../../utils/error.util.js";
+import AppError from "../../utils/error.util.js";
+
+import * as classService from "./class.service.js";
+import { sanitizeBody } from "../../utils/validation.util.js";
 
 //// CRUD
 
-const createClass = async (req, res, next) => {
+const create = async (req, res, next) => {
   try {
-    // filtering for _id and __v
-    let clss;
-    if (Array.isArray(req.body)) {
-      clss = req.body.map((cls) => {
-        const { _id, __v, ...rest } = cls;
-        return { ...rest, user: req.user.id };
-      });
-    } else {
-      const { _id, __v, ...rest } = req.body;
-      clss = { ...rest, user: req.user.id };
-    }
+    const createdClasses = await classService.create(sanitizeBody(req));
 
-    const createdClasses = await Class.create(clss);
     const classesArray = Array.isArray(createdClasses) ? createdClasses : [createdClasses];
+
     res.status(201).json({
       status: "success",
       results: classesArray.length,
@@ -33,13 +25,13 @@ const createClass = async (req, res, next) => {
   }
 };
 
-const getAllClasses = async (req, res, next) => {
+const getAll = async (req, res, next) => {
   try {
     let queryString = res.locals.queryOverrides
       ? { ...req.query, ...res.locals.queryOverrides }
       : req.query;
 
-    const features = new APIFeatures(Class.find({ user: req.user.id }), queryString)
+    const features = new APIFeatures(classService.getAll({ user: req.user._id }), queryString)
       .filter()
       .sort()
       .select()
@@ -59,16 +51,17 @@ const getAllClasses = async (req, res, next) => {
   }
 };
 
-const getById = async (req, res, next) => {
+const getOne = async (req, res, next) => {
   try {
-    const foundClass = await Class.findOne({ _id: req.params.id, user: req.user.id });
-    if (!foundClass) {
-      throw new appError("Class not found", 404);
-    }
+    const cls = await classService.getOne({
+      _id: req.params.id,
+      user: req.user._id,
+    });
+
     res.status(200).json({
       status: "success",
       data: {
-        class: foundClass,
+        class: cls,
       },
     });
   } catch (err) {
@@ -76,21 +69,13 @@ const getById = async (req, res, next) => {
   }
 };
 
-const updateById = async (req, res, next) => {
+const updateOne = async (req, res, next) => {
   try {
-    const { _id, __v, user, ...safeBody } = req.body;
-    const updatedClass = await Class.findOneAndUpdate(
-      { _id: req.params.id, user: req.user.id },
-      safeBody,
-      {
-        returnDocument: "after",
-        runValidators: true,
-      },
+    const updatedClass = await classService.updateOne(
+      { _id: req.params.id, user: req.user._id },
+      sanitizeBody(req),
     );
 
-    if (!updatedClass) {
-      throw new appError("Class not found", 404);
-    }
     res.status(200).json({
       status: "success",
       data: {
@@ -102,21 +87,17 @@ const updateById = async (req, res, next) => {
   }
 };
 
-const deleteById = async (req, res, next) => {
+const deleteOne = async (req, res, next) => {
   try {
-    const deletedClass = await Class.findOneAndDelete({ _id: req.params.id, user: req.user.id });
-    if (!deletedClass) {
-      throw new appError("Class not found", 404);
-    }
-    res.status(204).json({
-      status: "success",
-      data: {
-        class: null,
-      },
+    await classService.deleteOne({
+      _id: req.params.id,
+      user: req.user._id,
     });
+
+    res.status(204).end();
   } catch (err) {
     next(err);
   }
 };
 
-export { createClass, getAllClasses, getById, updateById, deleteById };
+export { create, getAll, getOne, updateOne, deleteOne };
