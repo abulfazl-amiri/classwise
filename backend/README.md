@@ -1,146 +1,248 @@
-# Classwise
+# Classwise API
 
-Classwise is a REST API for teachers who want to keep their classes, resources,
-progress notes, and next-session plans in one place.
+Classwise is a REST API that helps teachers run their teaching business from one
+place. A teacher can manage courses, schedule lessons and timetables, enroll and
+track students, share teaching resources with co-teachers, and hand off courses
+to other teachers through invites — all scoped to their own account.
 
-The backend is still under active development. The current focus is hardening
-auth, error handling, validation, and repeatable testing before adding more
-product features.
+The backend is under active development. The current focus is hardening the
+foundation (auth, sessions, validation, consistent error handling) before
+expanding the product surface.
 
-## What It Does
+## Features
 
-- Creates user accounts and signs users in with JWT access tokens.
-- Rotates refresh tokens through an HTTP-only cookie.
-- Supports forgot-password and reset-password email flow.
-- Lets each signed-in user create, read, update, and delete their own classes.
-- Lets each signed-in user create, read, update, and delete their own resources.
-- Supports filtering, sorting, field selection, and pagination on list routes.
-- Includes admin-only user management routes.
-- Uses a shared error class for most controller-level not-found and input
-  errors.
+- **Authentication** — signup/signin with JWT access tokens and rotating,
+  server-tracked refresh tokens stored in an HTTP-only cookie.
+- **Sessions** — list active sessions and revoke them individually or all at
+  once. Sensitive actions are protected by a short-lived "sudo" confirmation
+  token (re-enter password to unlock).
+- **Password recovery** — forgot/reset password flow with email delivery.
+- **Courses** — full CRUD, plus nested management of:
+  - **Lessons** — per-course lesson records.
+  - **Timetable** — the recurring weekly schedule for a course.
+  - **Enrollments** — students enrolled in a course.
+  - **Invites** — invite another teacher to co-teach or take over a course.
+- **Students** — CRUD for a teacher's students and a view of their enrollments.
+- **Resources** — CRUD for teaching materials, with per-teacher **access
+  sharing** so resources can be granted to or revoked from other teachers.
+- **Users** — self-service `/me` routes plus admin-only user management.
+- **List controls** — filtering, sorting, field selection, and pagination on
+  list endpoints via a shared query utility.
 
 ## Tech Stack
 
-- Node.js
-- Express
-- MongoDB and Mongoose
-- bcrypt
-- jsonwebtoken
-- cookie-parser
-- nodemailer
-- validator
-- dotenv
+- **Runtime:** Node.js (ES modules)
+- **Framework:** Express 5
+- **Database:** MongoDB with Mongoose
+- **Cache / token store:** Redis (via ioredis)
+- **Validation:** Zod, express-validator, validator, libphonenumber-js
+- **Auth:** jsonwebtoken, bcrypt, cookie-parser
+- **Email:** Resend (with nodemailer available)
+- **Logging:** Morgan
+- **Config:** dotenv
+- **Tooling:** ESLint, Prettier
 
-## Setup
+## Architecture
 
-Install dependencies:
+The code is organized by **feature**, not by technical layer. Each feature owns
+its routes, controller, service, repository, model, and schema, which keeps
+related logic together and makes features easy to find and extend.
+
+```text
+backend/
+├── src/
+│   ├── app.js                 # Express app, middleware, route mounting, error handler
+│   ├── server.js              # DB connection + server bootstrap
+│   ├── config/                # constants, Redis client
+│   ├── middleware/            # shared auth + validation middleware
+│   ├── utils/                 # error, token, email, query, password, parser helpers
+│   └── features/
+│       ├── auth/              # signup, signin, refresh, password reset, sudo token
+│       ├── users/             # /me routes + admin user management
+│       ├── sessions/          # active session listing + revocation
+│       ├── students/          # student CRUD + enrollments view
+│       ├── resources/         # resource CRUD + access sharing (access/)
+│       ├── nonTeachingDays/   # holidays / non-teaching day tracking
+│       └── courses/           # course CRUD, plus nested:
+│           ├── lessons/
+│           ├── timetable/
+│           ├── enrollments/
+│           └── invites/
+```
+
+A typical request flows **route → middleware (auth/validation) → controller →
+service → repository → model**.
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- A running MongoDB instance
+- A running Redis instance
+
+### Install
 
 ```bash
 npm install
 ```
 
-Create a `.env` file in the backend root:
+### Configure
+
+Create a `.env` file in the `backend/` root:
 
 ```env
 NODE_ENV=development
 PORT=3000
-MONGO_URI=mongodb_connection_string
 
-JWT_SECRET=access_token_secret
-JWT_EXPIRES_IN=15min
+MONGO_URI=your_mongodb_connection_string
+REDIS_URL=redis://127.0.0.1:6379
 
-JWT_REFRESH_SECRET=refresh_token_secret
-JWT_REFRESH_EXPIRES_IN=7d
+JWT_SECRET=your_access_token_secret
+JWT_EXPIRES_IN=15m
+REFRESH_TOKEN_EXPIRES_IN=7d
+RESET_TOKEN_EXPIRES_IN=15m
+SUDO_TOKEN_EXPIRES_IN=10m
 
-EMAIL_USER=your_email_address
-EMAIL_PASSWORD=your_email_app_password
-
+RESEND_API_KEY=your_resend_api_key
 CLIENT_URL=http://127.0.0.1:3000
 ```
 
-Run in development:
+### Run
 
 ```bash
-npm run dev
+npm run dev     # development, with reload (nodemon)
+npm start       # production
 ```
 
-Run normally:
+The server connects to MongoDB, then listens on `PORT` (default `3000`).
 
-```bash
-npm start
-```
+## API Overview
 
-The server listens on `127.0.0.1` and uses `PORT` from `.env`, or `3000` by
-default.
+All routes are versioned under `/api/v1`.
 
-## API Routes
-
-Auth and user routes are mounted at `/api/v1/auth`.
+### Auth — `/api/v1/auth`
 
 ```http
-POST   /api/v1/auth/signup
-POST   /api/v1/auth/signin
-POST   /api/v1/auth/refresh
-POST   /api/v1/auth/forgot-password
-POST   /api/v1/auth/reset-password/:resetToken
-
-GET    /api/v1/auth/me
-PATCH  /api/v1/auth/me
-DELETE /api/v1/auth/me
-PATCH  /api/v1/auth/me/change-password
-
-GET    /api/v1/auth/users
-GET    /api/v1/auth/users/:id
-PATCH  /api/v1/auth/users/:id
-DELETE /api/v1/auth/users/:id
-PATCH  /api/v1/auth/users/:id/role
+POST /signup
+POST /signin
+POST /logout
+POST /refresh
+POST /password/forgot
+POST /password/reset
+POST /confirm-password        # auth required — issues a sudo token
 ```
 
-Class routes are mounted at `/api/v1/classes` and require auth.
+### Users — `/api/v1/users`  _(auth required)_
 
 ```http
-GET    /api/v1/classes
-POST   /api/v1/classes
-GET    /api/v1/classes/:id
-PATCH  /api/v1/classes/:id
-DELETE /api/v1/classes/:id
+GET    /me
+PATCH  /me
+DELETE /me
+PATCH  /me/change-password
+
+GET    /                      # admin only
+GET    /:id                   # admin only
+PATCH  /:id                   # admin only
+DELETE /:id                   # admin only
+PATCH  /:id/role              # admin only
 ```
 
-Resource routes are mounted at `/api/v1/resources` and require auth.
+### Sessions — `/api/v1/sessions`  _(auth required)_
 
 ```http
-GET    /api/v1/resources
-POST   /api/v1/resources
-GET    /api/v1/resources/recent
-GET    /api/v1/resources/level
-GET    /api/v1/resources/:id
-PATCH  /api/v1/resources/:id
-DELETE /api/v1/resources/:id
+GET    /                      # list active sessions
+DELETE /                      # revoke all sessions (sudo required)
+GET    /:id
+DELETE /:id                   # revoke one session (sudo required)
 ```
 
-## Query Options
+### Courses — `/api/v1/courses`  _(auth required)_
 
-List routes use `APIFeatures`, so they support:
+```http
+GET    /
+POST   /
+GET    /:id
+PATCH  /:id
+DELETE /:id                   # owner only
+GET    /:id/teachers
+
+# nested resources
+/:courseId/timetable          # GET, POST, PATCH
+/:courseId/lessons            # GET, POST, GET/PATCH/DELETE :id
+/:courseId/enrollments        # GET, POST, GET/PATCH/DELETE :id
+/:courseId/invites            # POST  (owner only)
+```
+
+### Invites — `/api/v1/invites`  _(auth required)_
+
+```http
+GET    /                      # invites addressed to the current teacher
+POST   /:id/accept
+POST   /:id/reject
+```
+
+### Students — `/api/v1/students`  _(auth required)_
+
+```http
+GET    /
+POST   /
+GET    /:id
+PATCH  /:id
+DELETE /:id
+GET    /:id/enrollments
+```
+
+### Resources — `/api/v1/resources`  _(auth required)_
+
+```http
+GET    /
+POST   /
+GET    /recent                # alias: recently created resources
+GET    /:id
+PATCH  /:id
+DELETE /:id
+
+# access sharing
+/:resourceId/access           # GET (list), POST (grant)
+/:resourceId/access/:teacherId  # DELETE (revoke)
+```
+
+### List query options
+
+List endpoints support:
 
 ```http
 ?sort=-createdAt,name
-?fields=name,level,totalPages
+?fields=name,subject,fee
 ?page=2&limit=10
-?totalPages[gte]=100
+?fee[gte]=100
 ```
 
-## Current Status
+## Error Handling
 
-The app imports successfully and the main files pass syntax checks. Recent
-hardening cleaned up class/resource create response counts, class delete
-not-found handling, and the missing-role status for role updates.
+A shared `AppError` class marks expected (operational) errors. The global error
+handler in `app.js` normalizes Mongoose validation errors, duplicate-key
+conflicts, and JWT errors into consistent status codes and messages. In
+development it includes error codes, details, and stack traces; in production it
+returns a generic message for unexpected errors and logs the rest.
 
-There is still no real automated test suite because `npm test` is only the
-default placeholder script.
+## Status & Roadmap
 
-Before calling the backend production-ready, finish the error-response cleanup,
-tighten auth/session edge cases, normalize response shapes, and add repeatable
-tests or smoke checks for the main routes.
+Working today: auth, sessions, sudo confirmation, courses with nested
+lessons/timetable/enrollments/invites, students, resources with access sharing,
+and admin user management.
+
+Next up:
+
+- Add an automated test suite (`npm test` is still the default placeholder).
+- Mount and finish the `nonTeachingDays` feature (implemented but not yet wired
+  into `app.js`).
+- Continue normalizing response shapes across single vs. list endpoints.
+- Add token/session cleanup (TTL) for expired refresh and reset tokens.
+
+> For the detailed running state, open issues, and next steps, see
+> [`PROJECT_CONTEXT.md`](./PROJECT_CONTEXT.md).
 
 ## Author
 
