@@ -7,6 +7,7 @@ try {
   console.log("DB connected");
 } catch (err) {
   console.error("DB connection failed: ", err);
+  process.exit(1);
 }
 
 const PORT = process.env.PORT || 3000;

@@ -2,11 +2,14 @@ import mongoose from "mongoose";
 import validator from "validator";
 
 import Resource from "../resources/resource.model.js";
-import Class from "../classes/class.model.js";
+import Course from "../courses/course.model.js";
 import * as sessionService from "../sessions/session.service.js";
 
-const userSchema = mongoose.Schema(
+const userSchema = new mongoose.Schema(
   {
+    name: {
+      type: String,
+    },
     email: {
       type: String,
       required: [true, "Email is required"],
@@ -25,8 +28,8 @@ const userSchema = mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["user", "admin"],
-      default: "user",
+      enum: ["teacher", "admin"],
+      default: "teacher",
     },
   },
   { timestamps: true },
@@ -36,11 +39,12 @@ userSchema.pre("findOneAndDelete", async function () {
   const userId = this.getFilter()?._id;
   if (!userId) return;
 
-  await Resource.deleteMany({ user: userId });
-
-  await Class.deleteMany({ user: userId });
-
-  await sessionService.revokeAll(userId);
+  await Promise.all([
+    Resource.deleteMany({ teacher: userId }),
+    Course.deleteMany({ owner: userId }),
+    Course.updateMany({ teachers: userId }, { $pull: { teachers: userId } }),
+    sessionService.revokeAll(userId),
+  ]);
 });
 
 export default mongoose.model("User", userSchema);

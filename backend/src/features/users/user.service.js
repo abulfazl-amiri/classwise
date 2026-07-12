@@ -3,8 +3,9 @@ import AppError from "../../utils/error.util.js";
 import * as userRepository from "./user.repository.js";
 import * as passwordUtils from "../../utils/password.util.js";
 import * as sessionService from "../sessions/session.service.js";
+import QueryBuilder from "../../utils/query.util.js";
 
-// services
+// utils
 const createUser = async function ({ email, password }) {
   return await userRepository.create({
     email: email,
@@ -22,8 +23,8 @@ const verifyPassword = async function (email, password) {
   return user;
 };
 
-const resetPassword = async function (userId, password) {
-  await userRepository.updatePassword(userId, passwordUtils.hash(password));
+const resetPassword = async function (id, password) {
+  await userRepository.updatePassword(id, await passwordUtils.hash(password));
 };
 
 const userExist = async function (email) {
@@ -32,45 +33,52 @@ const userExist = async function (email) {
   return user;
 };
 
-const getAll = async function (filter) {
-  return await userRepository.findAll(filter);
+/////////////////// services
+
+const getFilteredUsers = async function (queryString) {
+  const query = new QueryBuilder(userRepository.buildQuery({}), queryString)
+    .filter()
+    .sort()
+    .select()
+    .paginate();
+  query.mongooseQuery.select("-passwordHash");
+  return await query.execute();
 };
 
-const getById = async function (userId) {
-  const user = await userRepository.findById(userId);
+const getById = async function (id) {
+  const user = await userRepository.findById(id);
   if (!user) throw new AppError("User not found", 404);
 
   return user;
 };
 
-const updateById = async function (userId, { email }) {
-  const user = await userRepository.updateById(userId, {
+const updateById = async function (id, { email, name }) {
+  const user = await userRepository.updateById(id, {
     email,
+    name,
   });
   if (!user) throw new AppError("User not found", 404);
 
   return user;
 };
 
-const deleteById = async function (userId) {
-  const user = await userRepository.deleteById(userId);
+const deleteById = async function (id) {
+  const user = await userRepository.deleteById(id);
   if (!user) throw new AppError("User not found", 404);
-
-  return user;
 };
 
-const updateRole = async function (userId, role) {
-  const user = await userRepository.updateRole(userId, role);
+const updateRole = async function (id, role) {
+  const user = await userRepository.updateRole(id, role);
   if (!user) throw new AppError("User not found", 404);
   return user;
 };
 
-const changePassword = async function ({ userId, oldPassword, newPassword }) {
-  const user = await userRepository.findById(userId);
+const changePassword = async function (id, { oldPassword, newPassword }) {
+  const user = await userRepository.findById(id);
   const updateduser = await verifyPassword(user.email, oldPassword);
-  if (!updateduser) throw new AppError("Old password was incorrect");
+  if (!updateduser) throw new AppError("Old password was incorrect", 401);
 
-  await userRepository.updatePassword(updateduser._id, passwordUtils.hash(newPassword));
+  await userRepository.updatePassword(updateduser._id, await passwordUtils.hash(newPassword));
   await sessionService.revokeAll(updateduser._id);
 };
 export {
@@ -79,7 +87,7 @@ export {
   resetPassword,
   changePassword,
   userExist,
-  getAll,
+  getFilteredUsers,
   getById,
   updateById,
   deleteById,

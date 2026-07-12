@@ -1,28 +1,27 @@
 import { Router } from "express";
 
 import * as resourceController from "./resource.controller.js";
+import resourceAccessRouter from "./access/resourceAccess.routes.js";
 import { authenticate } from "../../middleware/auth.middleware.js";
-import * as resourceValidator from "./resource.validator.js";
-import { handleValidationErrors } from "../../utils/validation.util.js";
-const router = Router();
+import { validateBody, validateParams } from "../../middleware/validation.middleware.js";
+import { createSchema, updateSchema } from "./resource.schema.js";
+import { resourceIdSchema } from "./resource.schema.js";
 
-router
-  .route("/recent")
-  .get(authenticate, resourceController.aliasRecent, resourceController.getAll);
+const router = Router();
+router.use(authenticate);
+
+router.route("/recent").get(resourceController.aliasRecent, resourceController.getAll);
 
 router
   .route("/")
-  .post(authenticate, resourceValidator.create, handleValidationErrors, resourceController.create)
-  .get(authenticate, resourceController.getAll);
+  .post(validateBody(createSchema), resourceController.create)
+  .get(resourceController.getAll);
+router.use("/:resourceId/access", resourceAccessRouter);
+
 router
   .route("/:id")
-  .get(authenticate, resourceController.getOne)
-  .patch(
-    authenticate,
-    resourceValidator.updateOne,
-    handleValidationErrors,
-    resourceController.updateOne,
-  )
-  .delete(authenticate, resourceController.deleteOne);
+  .get(validateParams(resourceIdSchema), resourceController.getOne)
+  .patch(validateParams(resourceIdSchema), validateBody(updateSchema), resourceController.updateOne)
+  .delete(validateParams(resourceIdSchema), resourceController.deleteOne);
 
 export default router;

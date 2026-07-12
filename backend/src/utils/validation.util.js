@@ -1,15 +1,11 @@
-import { validationResult } from "express-validator";
+import mongoose from "mongoose";
 
-const handleValidationErrors = (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(422).json({
-      status: "fail",
-      message:
-        process.env.NODE_ENV === "development" ? errors.array() : errors.array().map((e) => e.msg),
-    });
-  }
-  next();
+const isValidId = function (value) {
+  if (!value) return false;
+
+  if (value instanceof mongoose.Types.ObjectId) return true;
+
+  return typeof value === "string" && value.length === 24 && mongoose.Types.ObjectId.isValid(value);
 };
 
 /**
@@ -36,4 +32,4 @@ const sanitizeBody = function (req, overrideUser = true) {
   return safeBody;
 };
 
-export { handleValidationErrors, sanitizeBody };
+export { sanitizeBody, isValidId };

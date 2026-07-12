@@ -30,17 +30,17 @@ backend/
 ├── server.js
 ├── models/
 │   ├── user.model.js
-│   ├── class.model.js
+│   ├── course.model.js
 │   ├── resource.model.js
 │   ├── reset-token.model.js
 │   └── reset-token.model.js
 ├── controllers/
 │   ├── user.controller.js
-│   ├── class.controller.js
+│   ├── course.controller.js
 │   └── resource.controller.js
 ├── routes/
 │   ├── user.routes.js
-│   ├── class.routes.js
+│   ├── course.routes.js
 │   └── resource.routes.js
 ├── middleware/
 │   └── authMiddleware.js
@@ -124,7 +124,7 @@ Resource routes are mounted under `/api/v1/resources` and require auth:
 - `node --check app.js` passed.
 - `node --check models/user.model.js` passed.
 - `node --check controllers/user.controller.js` passed.
-- `node --check controllers/class.controller.js` passed.
+- `node --check controllers/course.controller.js` passed.
 - `node --check controllers/resource.controller.js` passed.
 - `node --check middleware/authMiddleware.js` passed.
 - `node -e "import('./app.js')"` passed.
@@ -178,7 +178,7 @@ Keep the focus on hardening before adding new features:
 node --check app.js
 node --check models/user.model.js
 node --check controllers/user.controller.js
-node --check controllers/class.controller.js
+node --check controllers/course.controller.js
 node --check controllers/resource.controller.js
 node --check middleware/authMiddleware.js
 node -e "import('./app.js')"

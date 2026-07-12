@@ -26,6 +26,6 @@ const setSudoTokenCookie = function (sudoToken, res) {
 };
 
 const removeCookie = function (name, res) {
-  res.clearCookie(name);
+  res.clearCookie(name, COOKIE_OPTIONS);
 };
 export { setRefreshTokenCookie, setSudoTokenCookie, removeCookie };

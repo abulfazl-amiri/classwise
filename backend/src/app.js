@@ -2,11 +2,13 @@ import express from "express";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
 
-import classRoutes from "./features/classes/class.routes.js";
-import resourceRoutes from "./features/resources/resource.routes.js";
-import userRoutes from "./features/users/user.routes.js";
-import authRoutes from "./features/auth/auth.routes.js";
-import sessionRoutes from "./features/sessions/session.routes.js";
+import courseRouter from "./features/courses/course.routes.js";
+import resourceRouter from "./features/resources/resource.routes.js";
+import userRouter from "./features/users/user.routes.js";
+import authRouter from "./features/auth/auth.routes.js";
+import sessionRouter from "./features/sessions/session.routes.js";
+import inviteRouter from "./features/courses/invites/routes/invite.routes.js";
+import studentRouter from "./features/students/student.routes.js";
 
 import AppError from "./utils/error.util.js";
 
@@ -22,15 +24,16 @@ app.set("query parser", "extended");
 app.set("trust proxy", true);
 
 // route mounting
-app.use("/api/v1/classes", classRoutes);
-app.use("/api/v1/resources", resourceRoutes);
-app.use("/api/v1/auth", authRoutes);
-app.use("/api/v1/users", userRoutes);
-app.use("/api/v1/sessions", sessionRoutes);
+app.use("/api/v1/students", studentRouter);
+app.use("/api/v1/courses", courseRouter);
+app.use("/api/v1/invites", inviteRouter);
+app.use("/api/v1/resources", resourceRouter);
+app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/users", userRouter);
+app.use("/api/v1/sessions", sessionRouter);
 
 app.get("/", function (req, res) {
   res.status(200).json({
-    status: "success",
     message: "Welcome to Classwise",
   });
 });
@@ -39,17 +42,17 @@ app.get("/", function (req, res) {
 app.use((req, res, next) => {
   const err = new AppError(
     `Could not find endpoint '${req.originalUrl}' on the available endpoints`,
+    404,
   );
-  err.statusCode = 404;
-  err.status = "fail";
   next(err);
 });
 
 // server error
 app.use((err, req, res, next) => {
   const env = process.env.NODE_ENV || "production";
+  const isDevelopment = env === "development";
 
-  if (env === "development") {
+  if (isDevelopment) {
     console.error(err);
   } else if (env === "production" && !(err instanceof AppError)) {
     console.error(err);
@@ -58,48 +61,44 @@ app.use((err, req, res, next) => {
   if (err.name === "ValidationError") {
     err.statusCode = 422;
     err.isOperational = true;
-    console.error(JSON.stringify(err, null, 2));
     err.message = Object.values(err.errors)
       .map((e) => e.message)
       .join(", ");
+    err.details = Object.values(err.errors).map((e) => ({
+      path: e.path,
+      message: e.message,
+    }));
   }
   if (err.code === 11000) {
     err.statusCode = 409;
-    err.status = "fail";
-    err.message = `${Object.keys(err.keyValue)[0]} is already exist`;
+    err.message = `${Object.keys(err.keyValue)[0]} already exists`;
     err.isOperational = true;
   }
 
   if (err.name === "TokenExpiredError") {
     err.statusCode = 401;
-    err.status = "fail";
     err.message = "Session expired, please log in again";
     err.isOperational = true;
   }
 
   if (err.name === "JsonWebTokenError") {
     err.statusCode = 401;
-    err.status = "fail";
     err.message = "Invalid token, please log in again";
     err.isOperational = true;
   }
 
-  err.statusCode = err.statusCode || 500;
-  err.status = err.status || "error";
+  const statusCode = err.statusCode || 500;
+  const response = {
+    message: err.isOperational ? err.message : "Something went wrong",
+  };
 
-  if (env === "development") {
-    res.status(err.statusCode).json({
-      status: err.status,
-      message: err.message,
-      stack: err.stack,
-      errObj: err,
-    });
-  } else {
-    res.status(err.statusCode).json({
-      status: err.status,
-      message: err.isOperational ? err.message : "Something went wrong",
-    });
+  if (isDevelopment) {
+    response.errorCode = err.errorCode || "SERVER_ERROR";
+    if (err.details) response.details = err.details;
+    if (err.stack) response.stack = err.stack;
   }
+
+  res.status(statusCode).json(response);
 });
 
 export default app;

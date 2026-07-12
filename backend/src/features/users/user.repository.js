@@ -1,7 +1,13 @@
 import User from "./user.model.js";
 
-const create = async function (data) {
-  return await User.create(data);
+const buildQuery = function ({ name } = {}) {
+  const query = {};
+  if (name) query.name = name;
+  return User.find(query);
+};
+
+const create = async function (dto) {
+  return await User.create(dto);
 };
 
 const findByEmail = async function (email, selectPasswordHash = false) {
@@ -11,32 +17,24 @@ const findByEmail = async function (email, selectPasswordHash = false) {
   return await User.findOne({ email: email }).select("+passwordHash");
 };
 
-const findOne = async function (filter) {
-  return await User.findOne(filter);
+const findById = async function (id) {
+  return await User.findById(id);
 };
 
-const findAll = async function (filter) {
-  return await User.find(filter);
-};
-
-const findById = async function (userId) {
-  return await User.findById(userId);
-};
-
-const updateById = async function (userId, data) {
-  return await User.findOneAndUpdate({ _id: userId }, data, {
+const updateById = async function (id, dto) {
+  return await User.findOneAndUpdate({ _id: id }, dto, {
     returnDocument: "after",
     runValidators: true,
   });
 };
 
-const deleteById = async function (userId) {
-  return await User.findOneAndDelete({ _id: userId });
+const deleteById = async function (id) {
+  return await User.findOneAndDelete({ _id: id });
 };
 
-const updatePassword = async function (userId, passwordHash) {
+const updatePassword = async function (id, passwordHash) {
   return await User.findOneAndUpdate(
-    { _id: userId },
+    { _id: id },
     { passwordHash: passwordHash },
     {
       returnDocument: "after",
@@ -45,9 +43,9 @@ const updatePassword = async function (userId, passwordHash) {
   );
 };
 
-const updateRole = async function (userId, role) {
+const updateRole = async function (id, role) {
   return await User.findOneAndUpdate(
-    { id: userId },
+    { _id: id },
     { role: role },
     {
       returnDocument: "after",
@@ -58,12 +56,11 @@ const updateRole = async function (userId, role) {
 
 export {
   create,
-  findOne,
   findByEmail,
   findById,
   updateById,
   deleteById,
   updatePassword,
-  findAll,
   updateRole,
+  buildQuery,
 };

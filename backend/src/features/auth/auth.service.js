@@ -23,7 +23,7 @@ const signup = async function ({ email, password, ip, userAgent }) {
   });
 
   return await sessionService.createSession({
-    userId: user._id,
+    userId: user.id,
     userAgent: userAgent,
     ip: ip,
   });
@@ -34,7 +34,7 @@ const signin = async function ({ email, password, ip, userAgent }) {
   if (!user) throw new AppError("Email or password was incorrect", 401);
 
   return await sessionService.createSession({
-    userId: user._id,
+    userId: user.id,
     userAgent: userAgent,
     ip: ip,
   });
@@ -50,7 +50,7 @@ const refresh = async function ({ refreshToken, ip, userAgent }) {
   await sessionService.deleteSession(refreshToken);
 
   return await sessionService.createSession({
-    userId: user._id,
+    userId: user.id,
     userAgent: userAgent,
     ip: ip,
   });
@@ -67,7 +67,7 @@ const forgotPassword = async function (email) {
   const resetToken = generateResetToken();
   const key = `reset:${hashToken(resetToken)}`;
 
-  await redis.set(key, user._id.toString(), "EX", parseToSec(process.env.RESET_TOKEN_EXPIRES_IN));
+  await redis.set(key, user.id.toString(), "EX", parseToSec(process.env.RESET_TOKEN_EXPIRES_IN));
 
   await sendEmail({
     to: user.email,
@@ -90,24 +90,19 @@ const resetPassword = async function (resetToken, newPassword) {
   const user = await userService.getById(userId);
 
   // update the passwordHash
-  await userService.resetPassword(user._id, newPassword);
+  await userService.resetPassword(user.id, newPassword);
 
-  await sessionService.revokeAll(user._id);
+  await sessionService.revokeAll(user.id);
 };
 
 // for creating sudo mode
-const confirmPassword = async function (email, password) {
+const confirmPassword = async function ({ email, password }) {
   const user = await userService.verifyPassword(email, password);
   if (!user) throw new AppError("Email or password was incorrect", 401);
 
   const sudoToken = generateSudoToken();
-  const sudoKey = `sudo:${sudoToken}`;
-  await redis.set(
-    sudoKey,
-    user._id.toString(),
-    "EX",
-    parseToSec(process.env.SUDO_TOKEN_EXPIRES_IN),
-  );
+  const sudoKey = `sudo:${hashToken(sudoToken)}`;
+  await redis.set(sudoKey, user.id, "EX", parseToSec(process.env.SUDO_TOKEN_EXPIRES_IN));
   return sudoToken;
 };
 export { signup, signin, refresh, logout, forgotPassword, resetPassword, confirmPassword };

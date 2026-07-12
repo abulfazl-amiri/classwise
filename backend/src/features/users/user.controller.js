@@ -1,30 +1,15 @@
-import User from "./user.model.js";
-
-import AppError from "../../utils/error.util.js";
-import APIFeatures from "../../utils/query.util.js";
-
-import { signAccessToken } from "../../utils/token.util.js";
-
 import * as userService from "./user.service.js";
 
-const getAllUsers = async function (req, res, next) {
+const getAll = async function (req, res, next) {
   try {
     const queryString = res.locals.queryOverrides
       ? { ...req.query, ...res.locals.queryOverrides }
       : { ...req.query };
+    const users = await userService.getFilteredUsers(queryString);
 
-    const features = new APIFeatures(userService.getAll({}), queryString)
-      .filter()
-      .sort()
-      .select()
-      .paginate();
-    const users = await features.query;
     res.status(200).json({
-      status: "success",
       results: users.length,
-      data: {
-        users: users,
-      },
+      data: users,
     });
   } catch (err) {
     next(err);
@@ -34,12 +19,7 @@ const getAllUsers = async function (req, res, next) {
 const getById = async function (req, res, next) {
   try {
     const user = await userService.getById(req.params.id);
-    res.status(200).json({
-      status: "success",
-      data: {
-        user: user,
-      },
-    });
+    res.status(200).json(user);
   } catch (err) {
     next(err);
   }
@@ -47,14 +27,9 @@ const getById = async function (req, res, next) {
 
 const updateById = async function (req, res, next) {
   try {
-    const { updatedUser } = await userService.updateById(req.params.id, req.body);
+    const user = await userService.updateById(req.params.id, req.body);
 
-    res.status(200).json({
-      status: "success",
-      data: {
-        user: updatedUser,
-      },
-    });
+    res.status(200).json(user);
   } catch (err) {
     next(err);
   }
@@ -71,13 +46,8 @@ const deleteById = async function (req, res, next) {
 
 const updateUserRole = async function (req, res, next) {
   try {
-    const updatedUser = await userService.updateRole(req.params.id, req.body.role);
-    res.status(200).json({
-      status: "success",
-      data: {
-        user: updatedUser,
-      },
-    });
+    const user = await userService.updateRole(req.params.id, req.body.role);
+    res.status(200).json(user);
   } catch (err) {
     next(err);
   }
@@ -85,11 +55,14 @@ const updateUserRole = async function (req, res, next) {
 
 const changePassword = async function (req, res, next) {
   try {
-    await userService.changePassword({ userId: req.user._id, ...req.body });
+    await userService.changePassword(req.user.id, {
+      oldPassword: req.body.oldPassword,
+      newPassword: req.body.newPassword,
+    });
     res.status(204).end();
   } catch (err) {
     next(err);
   }
 };
 
-export { getAllUsers, getById, updateById, deleteById, updateUserRole, changePassword };
+export { getAll, getById, updateById, deleteById, updateUserRole, changePassword };

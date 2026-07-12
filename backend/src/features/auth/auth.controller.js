@@ -11,7 +11,6 @@ const signup = async function (req, res, next) {
     cookieUtils.setRefreshTokenCookie(refreshToken, res);
 
     res.status(200).json({
-      status: "success",
       token: accessToken,
     });
   } catch (err) {
@@ -29,7 +28,6 @@ const signin = async function (req, res, next) {
     cookieUtils.setRefreshTokenCookie(refreshToken, res);
 
     res.status(200).json({
-      status: "success",
       token: accessToken,
     });
   } catch (err) {
@@ -47,7 +45,6 @@ const refresh = async function (req, res, next) {
     cookieUtils.setRefreshTokenCookie(refreshToken, res);
 
     res.status(200).json({
-      status: "success",
       token: accessToken,
     });
   } catch (err) {
@@ -57,13 +54,11 @@ const refresh = async function (req, res, next) {
 
 const logout = async function (req, res, next) {
   try {
-    await authService.logout(...req.cookies.refreshToken);
-    cookieUtils.removeCookie(req.cookies.refreshToken, res);
+    await authService.logout(req.cookies.refreshToken);
+    cookieUtils.removeCookie("refreshToken", res);
+    cookieUtils.removeCookie("sudoToken", res);
 
-    res.status(204).json({
-      status: "success",
-      token: null,
-    });
+    res.status(204).end();
   } catch (err) {
     next(err);
   }
@@ -73,7 +68,6 @@ const forgotPassword = async function (req, res, next) {
   try {
     await authService.forgotPassword(req.body.email);
     res.status(200).json({
-      status: "success",
       message: "Check your inbox for a reset link",
     });
   } catch (err) {
@@ -83,10 +77,9 @@ const forgotPassword = async function (req, res, next) {
 
 const resetPassword = async function (req, res, next) {
   try {
-    await authService.resetPassword(req.body.email, req.body.newPassword);
+    await authService.resetPassword(req.body.resetToken, req.body.newPassword);
 
     res.status(200).json({
-      status: "success",
       message: "Password reset successfully",
     });
   } catch (err) {
@@ -96,7 +89,10 @@ const resetPassword = async function (req, res, next) {
 
 const confirmPassword = async function (req, res, next) {
   try {
-    const sudoToken = await authService.confirmPassword(req.user.email, req.body.password);
+    const sudoToken = await authService.confirmPassword({
+      email: req.user.email,
+      password: req.body.password,
+    });
     cookieUtils.setSudoTokenCookie(sudoToken, res);
     res.status(204).end();
   } catch (err) {

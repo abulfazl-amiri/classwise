@@ -1,11 +1,11 @@
 import mongoose, { Schema } from "mongoose";
 
-const resourceSchema = mongoose.Schema(
+const resourceSchema = new mongoose.Schema(
   {
-    user: {
+    teacher: {
       type: Schema.Types.ObjectId,
       ref: "User",
-      required: [true, "User is required"],
+      required: [true, "Teacher is required"],
     },
     name: {
       type: String,
@@ -34,14 +34,7 @@ const resourceSchema = mongoose.Schema(
       type: String,
       lowercase: true,
       required: [true, "Level is required"],
-      enum: [
-        "beginner",
-        "pre-intermediate",
-        "intermediate",
-        "upper-intermediate",
-        "advanced",
-        "general",
-      ],
+      enum: ["beginner", "pre-intermediate", "intermediate", "upper-intermediate", "advanced"],
       trim: true,
     },
     edition: {

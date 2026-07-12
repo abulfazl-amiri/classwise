@@ -137,7 +137,7 @@ const deleteById = async function (sessionId) {
   const sessionIdKey = `session-id:${sessionId}`;
 
   const sessionKey = await redis.get(sessionIdKey);
-  const session = await redis.hgetAll(sessionKey);
+  const session = await redis.hgetall(sessionKey);
   if (!session?.sessionId || !session?.userId) throw new AppError("Session not found", 404);
 
   const userKey = `user-sessions:${session.userId}`;

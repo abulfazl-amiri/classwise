@@ -1,8 +1,6 @@
-import APIFeatures from "../../utils/query.util.js";
-
 import { sanitizeBody } from "../../utils/validation.util.js";
 import * as resourceService from "./resource.service.js";
-import * as resourceRepository from "./resource.repository.js";
+
 const aliasRecent = function (req, res, next) {
   res.locals.queryOverrides = { sort: "-createdAt", limit: 5 };
   next();
@@ -10,13 +8,15 @@ const aliasRecent = function (req, res, next) {
 
 const create = async (req, res, next) => {
   try {
-    const createdResource = await resourceService.create(sanitizeBody(req));
-    res.status(201).json({
-      status: "success",
-      data: {
-        resource: createdResource,
-      },
-    });
+    const sanitizedBody = sanitizeBody(req);
+    const payload = {
+      ...sanitizedBody,
+      teacher: req.user._id,
+    };
+    delete payload.user;
+
+    const createdResource = await resourceService.create(payload);
+    res.status(201).json(createdResource);
   } catch (err) {
     next(err);
   }
@@ -28,23 +28,10 @@ const getAll = async (req, res, next) => {
       ? { ...req.query, ...res.locals.queryOverrides }
       : req.query;
 
-    const features = new APIFeatures(
-      resourceRepository.buildQuery({ user: req.user._id }),
-      queryString,
-    )
-      .filter()
-      .sort()
-      .select()
-      .paginate();
-
-    const resources = await features.query;
-
+    const resources = await resourceService.getAll(req.user._id, queryString);
     res.status(200).json({
-      status: "success",
       results: resources.length,
-      data: {
-        resources: resources,
-      },
+      data: resources,
     });
   } catch (err) {
     next(err);
@@ -53,13 +40,11 @@ const getAll = async (req, res, next) => {
 
 const getOne = async (req, res, next) => {
   try {
-    const foundResource = await resourceService.getOne({ _id: req.params.id, user: req.user._id });
-    res.status(200).json({
-      status: "success",
-      data: {
-        resources: foundResource,
-      },
+    const foundResource = await resourceService.getOne({
+      _id: req.params.id,
+      teacher: req.user._id,
     });
+    res.status(200).json(foundResource);
   } catch (err) {
     next(err);
   }
@@ -67,16 +52,15 @@ const getOne = async (req, res, next) => {
 
 const updateOne = async (req, res, next) => {
   try {
+    const sanitizedBody = sanitizeBody(req);
+    delete sanitizedBody.user;
+    delete sanitizedBody.teacher;
+
     const updatedResource = await resourceService.updateOne(
-      { _id: req.params.id, user: req.user.id },
-      sanitizeBody(req),
+      { _id: req.params.id, teacher: req.user._id },
+      sanitizedBody,
     );
-    res.status(200).json({
-      status: "success",
-      data: {
-        resources: updatedResource,
-      },
-    });
+    res.status(200).json(updatedResource);
   } catch (err) {
     next(err);
   }
@@ -86,7 +70,7 @@ const deleteOne = async (req, res, next) => {
   try {
     await resourceService.deleteOne({
       _id: req.params.id,
-      user: req.user._id,
+      teacher: req.user._id,
     });
 
     res.status(204).end();
