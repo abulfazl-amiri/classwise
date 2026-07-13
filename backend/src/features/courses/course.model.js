@@ -3,6 +3,8 @@ import { ALLOWED_CURRENCY_CODES } from "../../config/constants.js";
 import Enrollment from "./enrollments/enrollment.model.js";
 import Lesson from "./lessons/lesson.model.js";
 import Timetable from "./timetable/timetable.model.js";
+import Invite from "./invites/invite.model.js";
+import NonTeachingDay from "../nonTeachingDays/nonTeachingDay.model.js";
 
 const courseSchema = new mongoose.Schema(
   {
@@ -76,7 +78,13 @@ courseSchema.pre("findOneAndDelete", async function () {
     Lesson.deleteMany({ course: courseId }),
     Timetable.deleteMany({ course: courseId }),
     Enrollment.deleteMany({ course: courseId }),
+    Invite.deleteMany({ course: courseId }),
+    // A non-teaching day can span several courses; only drop this course's id.
+    // The stale index cleanup removes any day left with no courses.
+    NonTeachingDay.updateMany({ courses: courseId }, { $pull: { courses: courseId } }),
   ]);
+
+  await NonTeachingDay.deleteMany({ courses: { $size: 0 } });
 });
 
 export default mongoose.model("Course", courseSchema);

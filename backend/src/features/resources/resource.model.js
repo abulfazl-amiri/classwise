@@ -1,4 +1,6 @@
 import mongoose, { Schema } from "mongoose";
+import ResourceAccess from "./access/resourceAccess.model.js";
+import Lesson from "../courses/lessons/lesson.model.js";
 
 const resourceSchema = new mongoose.Schema(
   {
@@ -46,5 +48,16 @@ const resourceSchema = new mongoose.Schema(
     timestamps: true,
   },
 );
+
+resourceSchema.pre("findOneAndDelete", async function () {
+  const resourceId = this.getFilter()?._id;
+  if (!resourceId) return;
+
+  await Promise.all([
+    ResourceAccess.deleteMany({ resource: resourceId }),
+    // Lessons require a resource, so a resource-less lesson is invalid — remove them.
+    Lesson.deleteMany({ resource: resourceId }),
+  ]);
+});
 
 export default mongoose.model("Resource", resourceSchema);

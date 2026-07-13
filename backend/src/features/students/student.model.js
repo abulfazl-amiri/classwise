@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import validator from "validator";
 import { isValidPhoneNumber } from "libphonenumber-js";
+import Enrollment from "../courses/enrollments/enrollment.model.js";
 
 const studentSchema = new mongoose.Schema(
   {
@@ -52,5 +53,12 @@ const studentSchema = new mongoose.Schema(
   },
   { timestamps: true },
 );
+
+studentSchema.pre("findOneAndDelete", async function () {
+  const studentId = this.getFilter()?._id;
+  if (!studentId) return;
+
+  await Enrollment.deleteMany({ student: studentId });
+});
 
 export default mongoose.model("Student", studentSchema);
