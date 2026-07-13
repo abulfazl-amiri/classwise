@@ -6,9 +6,11 @@ import * as sessionService from "../sessions/session.service.js";
 import QueryBuilder from "../../utils/query.util.js";
 
 // utils
-const createUser = async function ({ email, password }) {
+const createUser = async function ({ email, password, name }) {
+  if (!name) name = email.split("@")[0];
   return await userRepository.create({
-    email: email,
+    name,
+    email,
     passwordHash: await passwordUtils.hash(password),
   });
 };

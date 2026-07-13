@@ -13,13 +13,14 @@ import { parseToSec } from "../../utils/parser.util.js";
 
 //
 
-const signup = async function ({ email, password, ip, userAgent }) {
+const signup = async function ({ email, password, name, ip, userAgent }) {
   const foundEmail = await userRepository.findByEmail(email);
   if (foundEmail) throw new AppError("Email is already in use", 409);
 
   const user = await userService.createUser({
-    email: email,
-    password: password,
+    name,
+    email,
+    password,
   });
 
   return await sessionService.createSession({
