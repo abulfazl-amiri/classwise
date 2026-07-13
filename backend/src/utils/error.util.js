@@ -1,4 +1,4 @@
-const generateErrorCode = function (statusCode) {
+export const generateErrorCode = function (statusCode) {
   switch (statusCode) {
     case 400:
       return "BAD_REQUEST";

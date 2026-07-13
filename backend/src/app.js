@@ -10,7 +10,7 @@ import sessionRouter from "./features/sessions/session.routes.js";
 import inviteRouter from "./features/courses/invites/routes/invite.routes.js";
 import studentRouter from "./features/students/student.routes.js";
 
-import AppError from "./utils/error.util.js";
+import AppError, { generateErrorCode } from "./utils/error.util.js";
 
 const app = express();
 
@@ -61,9 +61,7 @@ app.use((err, req, res, next) => {
   if (err.name === "ValidationError") {
     err.statusCode = 422;
     err.isOperational = true;
-    err.message = Object.values(err.errors)
-      .map((e) => e.message)
-      .join(", ");
+    err.message = "Validation failed";
     err.details = Object.values(err.errors).map((e) => ({
       path: e.path,
       message: e.message,
@@ -71,7 +69,7 @@ app.use((err, req, res, next) => {
   }
   if (err.code === 11000) {
     err.statusCode = 409;
-    err.message = `${Object.keys(err.keyValue)[0]} already exists`;
+    err.message = `${Object.keys(err.keyValue)[0].slice(0, 1).toUpperCase() + Object.keys(err.keyValue)[0].slice(1)} already exists`;
     err.isOperational = true;
   }
 
@@ -90,10 +88,10 @@ app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
   const response = {
     message: err.isOperational ? err.message : "Something went wrong",
+    errorCode: err.errorCode || generateErrorCode(statusCode),
   };
 
   if (isDevelopment) {
-    response.errorCode = err.errorCode || "SERVER_ERROR";
     if (err.details) response.details = err.details;
     if (err.stack) response.stack = err.stack;
   }

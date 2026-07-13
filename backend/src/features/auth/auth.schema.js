@@ -1,5 +1,9 @@
 import * as z from "zod";
 
+const nameField = z.string({
+  error: (issue) => (issue.input === undefined ? "This field is required" : "Must be a string"),
+});
+
 const emailField = z.email({
   error: (issue) =>
     issue.input === undefined ? "This field is required" : "Must be a valid email",
@@ -18,6 +22,7 @@ const resetTokenField = z.string({
 const signupSchema = z.object({
   email: emailField,
   password: passwordField,
+  name: nameField,
 });
 
 const signinSchema = z.object({
