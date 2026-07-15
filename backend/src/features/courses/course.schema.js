@@ -30,12 +30,11 @@ const currencyCodeField = z
   .toUpperCase()
   .pipe(z.enum(ALLOWED_CURRENCY_CODES, "Invalid value"));
 
-const startDateField = z.coerce.date({
-  error: (issue) => (issue.input === undefined ? "This field is required" : "Invalid date"),
-});
-
-const endDateField = z.coerce.date({
-  error: (issue) => (issue.input === undefined ? "This field is required" : "Invalid date"),
+const dateField = z.iso.date({
+  error: (issue) =>
+    issue.input === undefined
+      ? "This field is required"
+      : "Invalid date, must be an ISO date format",
 });
 
 //////////// teachers
@@ -74,14 +73,6 @@ const enrollmentsField = z.array(singleEnrollmentId, {
   error: (issue) => (issue.input === undefined ? "This field is required" : "Must be an array"),
 });
 
-///////////
-
-const scheduleIdField = z
-  .string({
-    error: (issue) => (issue.input === undefined ? "This field is required" : "Must be a string"),
-  })
-  .regex(OBJECT_ID_REGEX, "Must be a valid ID");
-
 ///////////////////////////
 
 const createSchema = z.object({
@@ -89,14 +80,12 @@ const createSchema = z.object({
   subject: subjectField,
   fee: feeField,
   currencyCode: currencyCodeField,
-  startDate: startDateField,
-  endDate: endDateField,
+  startDate: dateField,
+  endDate: dateField,
 
   teachers: teachersField.optional(),
   resources: resourcesField.optional(),
   enrollments: enrollmentsField.optional(),
-
-  scheduleId: scheduleIdField.optional(),
 });
 
 const updateSchema = z.object({
@@ -104,13 +93,11 @@ const updateSchema = z.object({
   subject: subjectField.optional(),
   fee: feeField.optional(),
   currencyCode: currencyCodeField.optional(),
-  startDate: startDateField.optional(),
-  endDate: endDateField.optional(),
+  startDate: dateField.optional(),
+  endDate: dateField.optional(),
 
   teachers: teachersField.optional(),
   resources: resourcesField.optional(),
   enrollments: enrollmentsField.optional(),
-
-  scheduleId: scheduleIdField.optional(),
 });
 export { createSchema, updateSchema };

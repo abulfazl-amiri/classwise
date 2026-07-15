@@ -94,6 +94,7 @@ app.use((err, req, res, next) => {
   if (isDevelopment) {
     if (err.details) response.details = err.details;
     if (err.stack) response.stack = err.stack;
+    response.errorObj = err;
   }
 
   res.status(statusCode).json(response);
